@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PSM Sub-agent Priority Guide</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Sans',sans-serif;background:#FAFAF8;padding:24px 20px 48px;color:#1A1A18;max-width:860px;margin:0 auto;}
+h1{font-size:22px;font-weight:700;color:#1A1A18;margin-bottom:3px;}
+.sub{font-size:12px;color:#888780;margin-bottom:18px;}
+.filters{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:20px;}
+.fbtn{padding:5px 12px;border-radius:6px;border:1px solid #E0DED7;background:#fff;cursor:pointer;font-size:11px;font-weight:500;font-family:'DM Sans',sans-serif;color:#5F5E5A;transition:all .15s;}
+.fbtn:hover{border-color:#C8C6BE;}
+.fbtn.active{border-color:#534AB7;background:#EEEDFE;color:#3C3489;}
+.tier-label{font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:#B4B2A9;font-family:'DM Mono',monospace;margin:20px 0 8px;padding-bottom:5px;border-bottom:1px solid #F0EEE8;}
+.cards{display:flex;flex-direction:column;gap:7px;}
+.card{display:grid;grid-template-columns:28px 1fr auto;gap:0 12px;align-items:start;padding:11px 14px;background:#fff;border:0.5px solid #E8E6E0;border-radius:10px;cursor:pointer;transition:border-color .15s,box-shadow .15s;}
+.card:hover{border-color:#C8C6BE;box-shadow:0 2px 8px rgba(0,0,0,.05);}
+.card.expanded{border-color:#534AB7;box-shadow:0 0 0 1px rgba(83,74,183,.1);}
+.card.hidden{display:none;}
+.rank{font-size:12px;font-weight:700;color:#C8C6BE;text-align:center;padding-top:2px;font-family:'DM Mono',monospace;}
+.card-title{font-size:13px;font-weight:600;color:#1A1A18;line-height:1.3;margin-bottom:5px;}
+.pills{display:flex;flex-wrap:wrap;gap:4px;}
+.pill{padding:2px 7px;border-radius:4px;font-size:10px;font-weight:500;white-space:nowrap;}
+.p-pillar{background:#F1EFE8;color:#5F5E5A;}
+.p-b1{background:#EAF3DE;color:#27500A;}
+.p-b2{background:#E1F5EE;color:#085041;}
+.p-b3{background:#FAEEDA;color:#633806;}
+.p-b4{background:#FAECE7;color:#712B13;}
+.p-b5{background:#FCEBEB;color:#791F1F;}
+.p-dh{background:#EEEDFE;color:#3C3489;}
+.p-dm{background:#E6F1FB;color:#0C447C;}
+.p-dl{background:#F1EFE8;color:#444441;}
+.p-new{background:#FFF8E1;color:#633806;border:1px dashed #BA7517;}
+.p-live{background:#EAF3DE;color:#27500A;border:1px solid #97C459;}
+.scores{display:flex;flex-direction:column;gap:4px;min-width:58px;padding-top:2px;}
+.srow{display:flex;align-items:center;gap:4px;}
+.slabel{font-size:9px;color:#B4B2A9;font-family:'DM Mono',monospace;min-width:26px;text-align:right;}
+.strack{height:4px;width:48px;border-radius:2px;background:#F1EFE8;overflow:hidden;}
+.sfill{height:4px;border-radius:2px;}
+.detail{display:none;grid-column:1/-1;margin-top:10px;padding-top:10px;border-top:1px solid #F5F3EE;}
+.card.expanded .detail{display:block;}
+.dgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px 16px;}
+.dblock .dlabel{font-size:9px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#B4B2A9;font-family:'DM Mono',monospace;margin-bottom:3px;}
+.dblock .dtext{font-size:11px;color:#5F5E5A;line-height:1.55;}
+.team-note{margin-top:9px;padding:6px 10px;border-left:2px solid #534AB7;background:#EEEDFE18;border-radius:0 5px 5px 0;font-size:11px;color:#534AB7;font-style:italic;}
+</style>
+</head>
+<body>
+<h1>Sub-agent priority: build difficulty + demo impact</h1>
+<div class="sub">24 sub-agents · ranked easiest to hardest · click any card to expand · filter by tier or property</div>
+
+<div class="filters">
+  <button class="fbtn active" onclick="setFilter('all',this)">All (24)</button>
+  <button class="fbtn" onclick="setFilter('starter',this)">Starter (8)</button>
+  <button class="fbtn" onclick="setFilter('medium',this)">Medium (9)</button>
+  <button class="fbtn" onclick="setFilter('harder',this)">Harder (7)</button>
+  <button class="fbtn" onclick="setFilter('high-demo',this)">High demo impact</button>
+  <button class="fbtn" onclick="setFilter('new',this)">New in v3</button>
+  <button class="fbtn" onclick="setFilter('live',this)">Already live</button>
+</div>
+
+<div id="root"></div>
+
+<script>
+const A = [
+  {rank:1,title:"Business problem narrative",pillar:"Cross-fn",tier:"starter",build:1,demo:"high",isNew:false,isLive:false,
+   why:"Pure prompt + Drive RAG. Zero connectors needed. Write a system prompt, point at a doc folder, done in under an hour.",
+   tip:"Show before/after: type a customer problem, watch structured solution framing appear in 10 seconds. Audience immediately sees the value.",
+   conn:"Google Drive (read only)",out:"Slack reply",
+   note:"No Slack signal of anyone building this yet — wide open. Perfect for Kelly or Nick."},
+  {rank:2,title:"Pricing + narrative",pillar:"Cross-fn",tier:"starter",build:1,demo:"high",isNew:false,isLive:false,
+   why:"Drive RAG + a pricing doc. No connector beyond Drive. The framing guardrails are just prompt instructions.",
+   tip:"Demo the guardrail: ask for pricing without deal context, watch the agent decline and ask for stage first. Audiences love seeing refusal as a feature.",
+   conn:"Google Drive (read only)",out:"Slack reply",
+   note:"Jaimie, DC, Marilisa all flagged pricing calculator gaps in weekly updates. Instant credibility builder."},
+  {rank:3,title:"Weekly update drafter",pillar:"Intelligence",tier:"starter",build:1,demo:"high",isNew:false,isLive:false,
+   why:"SFDC read (one report query), format into the team's existing check-in template. Single connector, no write-back.",
+   tip:"Pull up Peter's real weekly update from last Monday, then show the agent regenerating it from SFDC data in 15 seconds.",
+   conn:"Salesforce (read)",out:"Slack / doc",
+   note:"Elli already runs a personal version via Cowork. This standardizes it for the whole team."},
+  {rank:4,title:"Morning digest",pillar:"Intelligence",tier:"starter",build:2,demo:"high",isNew:false,isLive:true,
+   why:"Slack + GCal reads only. Ethem has 4 live variants. Most proven pattern on the team.",
+   tip:"Run a live demo at 8am on demo day. Agent reads the channel, surfaces 3 flagged items. Instant 'I want that' reaction.",
+   conn:"Slack + GCal + Salesforce (read)",out:"Slack reply",
+   note:"Ethem's Agents 3 and 4 are doing this now. Present as the team-wide standard built on his pattern."},
+  {rank:5,title:"MQL flag (read-only)",pillar:"Cross-fn",tier:"starter",build:2,demo:"high",isNew:true,isLive:false,
+   why:"SFDC read + a domain blocklist in the prompt. No write-back required or possible. Pure filter logic.",
+   tip:"Show the raw MQL list, then the filtered output with gmail/naver/yahoo stripped and a count. Before/after contrast is immediate.",
+   conn:"Salesforce (read only — ceiling confirmed)",out:"Slack list to PSM",
+   note:"DC flagged this in the AI Week thread. Document the read-only ceiling explicitly so the team understands why."},
+  {rank:6,title:"Partner profile",pillar:"Partner Perf",tier:"starter",build:2,demo:"med",isNew:false,isLive:false,
+   why:"SFDC read query on a partner account. Format BOB, pipeline, customer count. No logic needed, just structure.",
+   tip:"Ask 'show me Merkle's profile' and watch it assemble in real time. Audience already knows Merkle — name recognition drives impact.",
+   conn:"Salesforce (read)",out:"Slack reply",
+   note:"Jaimie and Chayter both do Merkle QBR prep manually. Direct time-save."},
+  {rank:7,title:"Exec roll-up",pillar:"Intelligence",tier:"starter",build:2,demo:"high",isNew:false,isLive:false,
+   why:"Same SFDC query as bookings, reshaped by audience_level param. The reshaping logic is a prompt instruction, not code.",
+   tip:"Run the same query twice: once as IC, once 'for Peter'. Show the format shift. Audiences love seeing data reframed without extra work.",
+   conn:"Salesforce (read)",out:"Structured doc",
+   note:"Peter explicitly asked Courtney for an AI workflow to do exactly this."},
+  {rank:8,title:"Cert tracker",pillar:"Partner Perf",tier:"starter",build:2,demo:"med",isNew:false,isLive:false,
+   why:"SFDC or Drive read for cert data. Kelly already tracks this in a spreadsheet — agent just reads and alerts.",
+   tip:"Show a list of partners with expiring certs and the Slack alert it sends. Kelly's '17 certified in 2025, target 5x' stat makes the stakes tangible.",
+   conn:"Salesforce / Drive (read)",out:"Slack alert",
+   note:"Kelly explicitly said she wants an agent to report on certification completion. Build exactly that."},
+  {rank:9,title:"Deal note capture",pillar:"Deal & Pipeline",tier:"medium",build:3,demo:"high",isNew:false,isLive:false,
+   why:"Slack trigger → SFDC write. One write-back scoped to a single field. Hardest part is the SFDC write permission.",
+   tip:"Type a deal update in Slack, show it appearing in SFDC 5 seconds later. No login, no copy-paste. Most visceral demo on the list.",
+   conn:"Slack (trigger) + Salesforce (write)",out:"SFDC record",
+   note:"Mentioned in context notes as a top team pain point. Highest demo-to-effort ratio in the medium tier."},
+  {rank:10,title:"Stale triage",pillar:"Deal & Pipeline",tier:"medium",build:3,demo:"high",isNew:false,isLive:true,
+   why:"SFDC read for S0/S1 report + Slack alert. Courtney sends this manually every Tuesday. Agent automates it and adds next-action recs.",
+   tip:"Show Courtney's Tuesday bot message alongside the agent's version with added recommendations. Side-by-side contrast is the story.",
+   conn:"Salesforce (read)",out:"Slack alert",
+   note:"Courtney's 'Stale S0s Triage Tuesday' message is literally the template. Build from that."},
+  {rank:11,title:"Bookings query",pillar:"Intelligence",tier:"medium",build:3,demo:"med",isNew:false,isLive:true,
+   why:"SFDC read + time range logic. Ethem already does a version. Complexity is in the time range engine (YoY, QTD, custom).",
+   tip:"Ask 'AMER new bookings vs same quarter last year?' Watch it pull and compare. The YoY comparison is the money shot.",
+   conn:"Salesforce + Amp on Amp (read)",out:"Slack reply",
+   note:"Ethem's Agent 1 does daily ARR email. This is the on-demand query version."},
+  {rank:12,title:"Renewal cadence",pillar:"Partner Perf",tier:"medium",build:3,demo:"high",isNew:true,isLive:false,
+   why:"Amp-on-Amp (health scores) + SFDC (renewal dates). Both confirmed. Complexity is the intervention logic prompt.",
+   tip:"Show a red-health account: agent recommends 'branch out across org — EB departed'. Show a bankrupt account: 'predict churn, move on'. The reasoning is what impresses.",
+   conn:"Amp on Amp + Salesforce (read)",out:"Slack digest",
+   note:"DC asked for 'account health check' in his AI Week thread. This is the direct answer."},
+  {rank:13,title:"Capabilities map",pillar:"Partner Perf",tier:"medium",build:3,demo:"med",isNew:false,isLive:false,
+   why:"Drive + SFDC read. Complexity is joining company-level and individual-level capability data into one view.",
+   tip:"Ask 'who on the Converteo team is certified in experimentation?' Show results by person and competency. Specific names drive the demo.",
+   conn:"Salesforce + Google Drive (read)",out:"Slack reply",
+   note:"Kelly's cert tracker spreadsheet is the seed data. Pair this with Cert tracker."},
+  {rank:14,title:"Co-sell health",pillar:"Co-sell Collab",tier:"medium",build:3,demo:"med",isNew:false,isLive:false,
+   why:"SFDC + Slack read for engagement signals. Complexity is defining 'joint engagement' in the prompt.",
+   tip:"Pull a co-sell deal and show last Slack mention, last SFDC activity, and partner last login as a single recency snapshot.",
+   conn:"Salesforce + Slack (read)",out:"Slack reply",
+   note:""},
+  {rank:15,title:"Promos & credits",pillar:"Deal & Pipeline",tier:"medium",build:3,demo:"med",isNew:false,isLive:false,
+   why:"Drive RAG on an eligibility matrix doc. Medium because wrong answers in a demo kill trust — prompt needs to be precise.",
+   tip:"Ask 'is this deal eligible for AWS credits?' Watch agent cite the specific criteria. Citation builds more trust than a plain yes/no.",
+   conn:"Google Drive + Salesforce (read)",out:"Slack reply",
+   note:"Kim flagged MPOPP vs WMP confusion repeatedly. This resolves it for the whole team."},
+  {rank:16,title:"Best partner fit",pillar:"Partner Perf",tier:"medium",build:4,demo:"high",isNew:false,isLive:false,
+   why:"Crossbeam + SFDC + Drive RAG. Three connectors, all read-only. Complexity is the matching logic across segment/use case/relationship signals.",
+   tip:"Drop in a real prospect, watch the agent recommend a partner with reasoning. 'Startup + complex workflow redesign → workflow partner' is your demo script.",
+   conn:"Crossbeam + Salesforce + Drive (read)",out:"Slack reply",
+   note:"Edwin asked for 'how to find new and best contributing partners' in his AI Week ideas. This is exactly that."},
+  {rank:17,title:"AE account match",pillar:"Partner Perf",tier:"medium",build:4,demo:"high",isNew:false,isLive:false,
+   why:"SFDC + Crossbeam. Complexity is joining TpARR ranking with relationship depth from Crossbeam.",
+   tip:"Ask 'which of Tod's A+ accounts have partners with strong relationships?' — use a real AE name. Specificity makes the demo feel real.",
+   conn:"Salesforce + Crossbeam (read)",out:"Slack reply",
+   note:"Edwin and Perri both thinking about account-partner matching. Strong AMER + EMEA parallel build."},
+  {rank:18,title:"Forecast roll-up",pillar:"Deal & Pipeline",tier:"harder",build:4,demo:"high",isNew:false,isLive:false,
+   why:"SFDC + math model (commit/strong upside/upside weighting) + PSM judgment override. Three moving parts.",
+   tip:"Show raw SFDC data → weighted mathematical forecast → PSM override ('bumping this upside because I know the champion'). Three steps, one screen.",
+   conn:"Salesforce (read)",out:"Structured doc",
+   note:"Peter's recommended build. Highest strategic value. Elli already does a manual version in a spreadsheet."},
+  {rank:19,title:"MDF & payments",pillar:"Cross-fn",tier:"harder",build:4,demo:"med",isNew:false,isLive:false,
+   why:"SFDC + Finance system. Complexity is accessing MDF balance and request status — may require Ops involvement to unlock.",
+   tip:"Show a partner's MDF balance and open requests in one query. Courtney's manual workflow is the before state.",
+   conn:"Salesforce + Finance (read)",out:"Slack reply",
+   note:""},
+  {rank:20,title:"Referral payments",pillar:"Cross-fn",tier:"harder",build:4,demo:"med",isNew:true,isLive:false,
+   why:"SFDC + Tipalti (uncertain). Falls back to SFDC closed deal amounts only if Tipalti unavailable.",
+   tip:"Show bidirectional: 'what do we owe Twilio?' and 'what does Adswerve still owe us?' in the same query. The bidirectional framing is novel.",
+   conn:"Salesforce + Tipalti (uncertain — validate Phase 1)",out:"Slack reply",
+   note:"Ethem surfaced the exact five payment jobs in Slack. Shay Casey's Q2 payment update is the historical template."},
+  {rank:21,title:"Joint acct planning",pillar:"Co-sell Collab",tier:"harder",build:4,demo:"high",isNew:false,isLive:false,
+   why:"SFDC read + template pre-fill. Complexity is pulling the right deal history and formatting into the JAP template correctly.",
+   tip:"Open a blank JAP template, run the agent, watch it populate with real deal data. The visual fill-in is the demo — 30 seconds.",
+   conn:"Salesforce (read) + Google Drive",out:"Document",
+   note:"Mentioned in original context notes as a key AE workflow to automate."},
+  {rank:22,title:"Call notes ingestion",pillar:"Co-sell Collab",tier:"harder",build:5,demo:"high",isNew:false,isLive:false,
+   why:"Granola MCP + SFDC write. Two connectors plus write-back. Granola confirmed, Zoom uncertain.",
+   tip:"Play 30 seconds of a Granola transcript, then show the structured SFDC activity record the agent created. Speed of capture is the story.",
+   conn:"Granola / Zoom + Salesforce (write)",out:"SFDC record",
+   note:"Tim Hughes already wiring partner integrations into demo environments. Natural collaboration opportunity."},
+  {rank:23,title:"Deal reg validation",pillar:"Co-sell Collab",tier:"harder",build:5,demo:"med",isNew:false,isLive:false,
+   why:"SFDC read + MEDDPICC scoring logic + routing workflow to AE/RSD/Ops. Three layers of logic.",
+   tip:"Submit a thin deal reg, watch the agent score it, flag gaps, and route to AE with a specific ask. The routing chain is what makes it feel like a real workflow.",
+   conn:"Salesforce (read) + routing logic",out:"Slack + SFDC",
+   note:"Jaimie flagged retrodating and deal reg questions in weekly updates. Real ongoing pain."},
+  {rank:24,title:"DR workflow & routing",pillar:"Co-sell Collab",tier:"harder",build:5,demo:"med",isNew:false,isLive:false,
+   why:"Depends on deal reg validation being built first. Complexity is the conditional AE → RSD → Ops escalation tree.",
+   tip:"Show a rejected DR and the auto-drafted escalation Slack message with context. The generated escalation note is the demo moment.",
+   conn:"Salesforce (read) + Slack (write)",out:"Slack routing message",
+   note:"Best built as a Phase 2 extension of deal reg validation, not standalone."},
+];
+
+const TIER_LABELS = {
+  starter:"Tier 1 — Starter  (build in a day)",
+  medium:"Tier 2 — Medium  (2–3 days)",
+  harder:"Tier 3 — Harder  (3–5 days or post-AI Week)"
+};
+const BUILD_LABEL = ["","Very easy","Easy","Medium","Hard","Complex"];
+const BUILD_CLS = ["","p-b1","p-b2","p-b3","p-b4","p-b5"];
+const BUILD_COLOR = ["","#3B6D11","#0F6E56","#854F0B","#993C1D","#791F1F"];
+const DEMO_CLS = {high:"p-dh",med:"p-dm",low:"p-dl"};
+
+let activeFilter = "all";
+let expandedRank = null;
+
+function setFilter(f, btn) {
+  activeFilter = f;
+  document.querySelectorAll(".fbtn").forEach(b => b.classList.remove("active"));
+  btn.classList.add("active");
+  render();
+}
+
+function toggle(rank) {
+  expandedRank = expandedRank === rank ? null : rank;
+  render();
+}
+
+function visible(a) {
+  if (activeFilter === "all") return true;
+  if (activeFilter === "starter") return a.tier === "starter";
+  if (activeFilter === "medium") return a.tier === "medium";
+  if (activeFilter === "harder") return a.tier === "harder";
+  if (activeFilter === "high-demo") return a.demo === "high";
+  if (activeFilter === "new") return a.isNew;
+  if (activeFilter === "live") return a.isLive;
+  return true;
+}
+
+function card(a) {
+  const exp = expandedRank === a.rank;
+  const vis = visible(a);
+  const demoW = a.demo === "high" ? 48 : a.demo === "med" ? 29 : 10;
+  const buildW = Math.round((a.build / 5) * 48);
+  return `<div class="card${exp?" expanded":""}${!vis?" hidden":""}" onclick="toggle(${a.rank})">
+  <div class="rank">${a.rank}</div>
+  <div>
+    <div class="card-title">${a.title}</div>
+    <div class="pills">
+      <span class="pill p-pillar">${a.pillar}</span>
+      <span class="pill ${BUILD_CLS[a.build]}">${BUILD_LABEL[a.build]}</span>
+      <span class="pill ${DEMO_CLS[a.demo]}">Demo: ${a.demo}</span>
+      ${a.isNew?`<span class="pill p-new">new v3</span>`:""}
+      ${a.isLive?`<span class="pill p-live">already live</span>`:""}
+    </div>
+  </div>
+  <div class="scores">
+    <div class="srow"><span class="slabel">build</span><div class="strack"><div class="sfill" style="width:${buildW}px;background:${BUILD_COLOR[a.build]}"></div></div></div>
+    <div class="srow"><span class="slabel">demo</span><div class="strack"><div class="sfill" style="width:${demoW}px;background:${a.demo==="high"?"#534AB7":a.demo==="med"?"#185FA5":"#888780"}"></div></div></div>
+  </div>
+  <div class="detail">
+    <div class="dgrid">
+      <div class="dblock"><div class="dlabel">Why this difficulty</div><div class="dtext">${a.why}</div></div>
+      <div class="dblock"><div class="dlabel">Demo tip</div><div class="dtext">${a.tip}</div></div>
+      <div class="dblock"><div class="dlabel">Connectors</div><div class="dtext">${a.conn}</div></div>
+      <div class="dblock"><div class="dlabel">Output</div><div class="dtext">${a.out}</div></div>
+    </div>
+    ${a.note?`<div class="team-note">${a.note}</div>`:""}
+  </div>
+</div>`;
+}
+
+function render() {
+  let html = "";
+  for (const tier of ["starter","medium","harder"]) {
+    const inTier = A.filter(a => a.tier === tier);
+    const anyVisible = inTier.some(a => visible(a));
+    if (!anyVisible) continue;
+    html += `<div class="tier-label">${TIER_LABELS[tier]}</div><div class="cards">`;
+    inTier.forEach(a => { html += card(a); });
+    html += `</div>`;
+  }
+  document.getElementById("root").innerHTML = html;
+}
+
+render();
+</script>
+</body>
+</html>
