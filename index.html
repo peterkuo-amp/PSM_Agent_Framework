@@ -3,24 +3,55 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PSM Sub-agent Priority Guide</title>
+<title>PSM Sub-agent Priority Guide v2</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:'DM Sans',sans-serif;background:#FAFAF8;padding:24px 20px 48px;color:#1A1A18;max-width:860px;margin:0 auto;}
+body{font-family:'DM Sans',sans-serif;background:#FAFAF8;padding:24px 20px 48px;color:#1A1A18;max-width:960px;margin:0 auto;}
 h1{font-size:22px;font-weight:700;color:#1A1A18;margin-bottom:3px;}
 .sub{font-size:12px;color:#888780;margin-bottom:18px;}
-.filters{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:20px;}
+
+/* Filter bar */
+.filter-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;}
+.filter-group-label{font-size:9px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:#B4B2A9;font-family:'DM Mono',monospace;margin-bottom:5px;margin-top:10px;}
 .fbtn{padding:5px 12px;border-radius:6px;border:1px solid #E0DED7;background:#fff;cursor:pointer;font-size:11px;font-weight:500;font-family:'DM Sans',sans-serif;color:#5F5E5A;transition:all .15s;}
 .fbtn:hover{border-color:#C8C6BE;}
 .fbtn.active{border-color:#534AB7;background:#EEEDFE;color:#3C3489;}
+.fbtn.active-open{border-color:#27500A;background:#EAF3DE;color:#27500A;}
+.fbtn.active-claimed{border-color:#993C1D;background:#FAECE7;color:#712B13;}
+
+/* Claim input row */
+.claim-row{display:flex;align-items:center;gap:8px;margin-bottom:18px;padding:10px 14px;background:#fff;border:0.5px solid #E8E6E0;border-radius:8px;}
+.claim-row label{font-size:11px;color:#5F5E5A;white-space:nowrap;}
+.claim-row input[type="text"]{flex:1;border:0.5px solid #E0DED7;border-radius:5px;padding:5px 9px;font-size:11px;font-family:'DM Sans',sans-serif;color:#1A1A18;background:#FAFAF8;outline:none;max-width:220px;}
+.claim-row input[type="text"]:focus{border-color:#534AB7;}
+.claim-row .claim-hint{font-size:10px;color:#B4B2A9;font-style:italic;}
+
+/* Tier labels */
 .tier-label{font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:#B4B2A9;font-family:'DM Mono',monospace;margin:20px 0 8px;padding-bottom:5px;border-bottom:1px solid #F0EEE8;}
 .cards{display:flex;flex-direction:column;gap:7px;}
-.card{display:grid;grid-template-columns:28px 1fr auto;gap:0 12px;align-items:start;padding:11px 14px;background:#fff;border:0.5px solid #E8E6E0;border-radius:10px;cursor:pointer;transition:border-color .15s,box-shadow .15s;}
+
+/* Card layout: checkbox | rank | main | scores */
+.card{display:grid;grid-template-columns:32px 28px 1fr auto;gap:0 10px;align-items:start;padding:11px 14px;background:#fff;border:0.5px solid #E8E6E0;border-radius:10px;transition:border-color .15s,box-shadow .15s;position:relative;}
 .card:hover{border-color:#C8C6BE;box-shadow:0 2px 8px rgba(0,0,0,.05);}
 .card.expanded{border-color:#534AB7;box-shadow:0 0 0 1px rgba(83,74,183,.1);}
+.card.claimed{border-color:#97C459;background:#FAFFF7;}
 .card.hidden{display:none;}
+
+/* Checkbox column */
+.cb-col{display:flex;flex-direction:column;align-items:center;gap:4px;padding-top:2px;}
+.cb-wrap{position:relative;width:18px;height:18px;}
+.cb-wrap input[type="checkbox"]{position:absolute;opacity:0;width:18px;height:18px;cursor:pointer;margin:0;z-index:2;}
+.cb-box{width:18px;height:18px;border-radius:4px;border:1.5px solid #D3D1C7;background:#fff;display:flex;align-items:center;justify-content:center;transition:all .15s;pointer-events:none;}
+.cb-wrap input:checked ~ .cb-box{background:#3B6D11;border-color:#3B6D11;}
+.cb-check{display:none;width:10px;height:10px;}
+.cb-wrap input:checked ~ .cb-box .cb-check{display:block;}
+.owner-badge{font-size:9px;font-weight:600;color:#27500A;background:#EAF3DE;border-radius:3px;padding:1px 4px;max-width:52px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:center;display:none;}
+.owner-badge.visible{display:block;}
+
+/* Rank + main */
 .rank{font-size:12px;font-weight:700;color:#C8C6BE;text-align:center;padding-top:2px;font-family:'DM Mono',monospace;}
+.card-clickable{cursor:pointer;}
 .card-title{font-size:13px;font-weight:600;color:#1A1A18;line-height:1.3;margin-bottom:5px;}
 .pills{display:flex;flex-wrap:wrap;gap:4px;}
 .pill{padding:2px 7px;border-radius:4px;font-size:10px;font-weight:500;white-space:nowrap;}
@@ -35,24 +66,80 @@ h1{font-size:22px;font-weight:700;color:#1A1A18;margin-bottom:3px;}
 .p-dl{background:#F1EFE8;color:#444441;}
 .p-new{background:#FFF8E1;color:#633806;border:1px dashed #BA7517;}
 .p-live{background:#EAF3DE;color:#27500A;border:1px solid #97C459;}
+.p-agent{background:#EEEDFE;color:#3C3489;border:1px solid #AFA9EC;}
+.p-skill{background:#F1EFE8;color:#444441;border:1px solid #B4B2A9;}
+
+/* Scores */
 .scores{display:flex;flex-direction:column;gap:4px;min-width:58px;padding-top:2px;}
 .srow{display:flex;align-items:center;gap:4px;}
 .slabel{font-size:9px;color:#B4B2A9;font-family:'DM Mono',monospace;min-width:26px;text-align:right;}
 .strack{height:4px;width:48px;border-radius:2px;background:#F1EFE8;overflow:hidden;}
 .sfill{height:4px;border-radius:2px;}
+
+/* Detail panel */
 .detail{display:none;grid-column:1/-1;margin-top:10px;padding-top:10px;border-top:1px solid #F5F3EE;}
 .card.expanded .detail{display:block;}
 .dgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px 16px;}
 .dblock .dlabel{font-size:9px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#B4B2A9;font-family:'DM Mono',monospace;margin-bottom:3px;}
 .dblock .dtext{font-size:11px;color:#5F5E5A;line-height:1.55;}
+
+/* Data deps */
+.deps-block{margin-top:10px;}
+.deps-block .dlabel{font-size:9px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#B4B2A9;font-family:'DM Mono',monospace;margin-bottom:5px;}
+.deps-list{display:flex;flex-wrap:wrap;gap:4px;}
+.dep-chip{padding:2px 8px;border-radius:4px;font-size:10px;font-weight:500;border:0.5px solid;}
+.dep-confirmed{background:#EAF3DE;color:#27500A;border-color:#97C459;}
+.dep-uncertain{background:#FFF8E1;color:#633806;border-color:#EF9F27;}
+.dep-none{background:#F1EFE8;color:#5F5E5A;border-color:#C8C6BE;}
+
+/* Type block */
+.type-block{margin-top:10px;padding:7px 10px;border-radius:6px;display:flex;align-items:flex-start;gap:8px;}
+.type-block.is-agent{background:#EEEDFE30;border-left:2px solid #534AB7;}
+.type-block.is-skill{background:#F1EFE830;border-left:2px solid #5F5E5A;}
+.type-block-label{font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;font-family:'DM Mono',monospace;margin-bottom:2px;}
+.is-agent .type-block-label{color:#534AB7;}
+.is-skill .type-block-label{color:#5F5E5A;}
+.type-block-text{font-size:11px;color:#5F5E5A;line-height:1.5;}
+
 .team-note{margin-top:9px;padding:6px 10px;border-left:2px solid #534AB7;background:#EEEDFE18;border-radius:0 5px 5px 0;font-size:11px;color:#534AB7;font-style:italic;}
+
+/* Claimed banner inside card */
+.claimed-banner{display:none;grid-column:1/-1;margin-top:6px;padding:5px 10px;background:#EAF3DE;border-radius:5px;font-size:11px;color:#27500A;font-weight:500;}
+.card.claimed .claimed-banner{display:block;}
+
+/* Summary bar */
+.summary-bar{display:flex;gap:16px;padding:10px 14px;background:#fff;border:0.5px solid #E8E6E0;border-radius:8px;margin-bottom:16px;flex-wrap:wrap;}
+.stat{display:flex;flex-direction:column;gap:1px;}
+.stat-val{font-size:18px;font-weight:700;color:#1A1A18;font-family:'DM Mono',monospace;}
+.stat-label{font-size:10px;color:#888780;}
+.stat-val.green{color:#27500A;}
+.stat-val.amber{color:#854F0B;}
 </style>
 </head>
 <body>
-<h1>Sub-agent priority: build difficulty + demo impact</h1>
-<div class="sub">24 sub-agents · ranked easiest to hardest · click any card to expand · filter by tier or property</div>
 
-<div class="filters">
+<h1>PSM Sub-agent + Skill priority guide</h1>
+<div class="sub">24 items · ranked easiest to hardest · click any card to expand · check the box to claim for AI Week</div>
+
+<!-- Claim name input -->
+<div class="claim-row">
+  <label>Your name (for claiming):</label>
+  <input type="text" id="claimName" placeholder="e.g. Ethem, Kelly, DC…" oninput="updateClaimHint()">
+  <span class="claim-hint" id="claimHint">Enter your name, then check a box to claim an item</span>
+</div>
+
+<!-- Summary bar -->
+<div class="summary-bar" id="summaryBar">
+  <div class="stat"><span class="stat-val" id="s-total">24</span><span class="stat-label">Total items</span></div>
+  <div class="stat"><span class="stat-val green" id="s-claimed">0</span><span class="stat-label">Claimed</span></div>
+  <div class="stat"><span class="stat-val amber" id="s-open">24</span><span class="stat-label">Open</span></div>
+  <div class="stat"><span class="stat-val" id="s-agent">—</span><span class="stat-label">Sub-agents</span></div>
+  <div class="stat"><span class="stat-val" id="s-skill">—</span><span class="stat-label">Skills</span></div>
+</div>
+
+<!-- Filters -->
+<div class="filter-group-label">Filter by tier / property</div>
+<div class="filter-row">
   <button class="fbtn active" onclick="setFilter('all',this)">All (24)</button>
   <button class="fbtn" onclick="setFilter('starter',this)">Starter (8)</button>
   <button class="fbtn" onclick="setFilter('medium',this)">Medium (9)</button>
@@ -61,150 +148,287 @@ h1{font-size:22px;font-weight:700;color:#1A1A18;margin-bottom:3px;}
   <button class="fbtn" onclick="setFilter('new',this)">New in v3</button>
   <button class="fbtn" onclick="setFilter('live',this)">Already live</button>
 </div>
+<div class="filter-group-label">Filter by type</div>
+<div class="filter-row">
+  <button class="fbtn" onclick="setFilter('agent',this)">Sub-agents only</button>
+  <button class="fbtn" onclick="setFilter('skill',this)">Skills only</button>
+</div>
+<div class="filter-group-label">Filter by claim status</div>
+<div class="filter-row" id="claimFilters">
+  <button class="fbtn" onclick="setFilter('open',this)">Open (unclaimed)</button>
+  <button class="fbtn" onclick="setFilter('claimed',this)">Claimed this week</button>
+</div>
 
-<div id="root"></div>
+<div id="root" style="margin-top:16px;"></div>
 
 <script>
+// ── DATA ──────────────────────────────────────────────────────────────
+// type: "agent" = sub-agent (goal-directed, judgment required)
+//       "skill" = skill (deterministic, reusable, context-free)
+// typeReason: one-line explanation of the classification
+// deps: array of {name, status} where status is "confirmed"|"uncertain"|"none"
+
 const A = [
   {rank:1,title:"Business problem narrative",pillar:"Cross-fn",tier:"starter",build:1,demo:"high",isNew:false,isLive:false,
+   type:"agent",typeReason:"Has a goal (frame a compelling client narrative), makes editorial decisions, produces shaped output. Judgment at every section.",
+   deps:[{n:"Google Drive",s:"confirmed"},{n:"Internal KB docs",s:"confirmed"}],
    why:"Pure prompt + Drive RAG. Zero connectors needed. Write a system prompt, point at a doc folder, done in under an hour.",
    tip:"Show before/after: type a customer problem, watch structured solution framing appear in 10 seconds. Audience immediately sees the value.",
    conn:"Google Drive (read only)",out:"Slack reply",
    note:"No Slack signal of anyone building this yet — wide open. Perfect for Kelly or Nick."},
+
   {rank:2,title:"Pricing + narrative",pillar:"Cross-fn",tier:"starter",build:1,demo:"high",isNew:false,isLive:false,
+   type:"agent",typeReason:"Must assess deal context, retrieve the right pricing tier, and construct a framing narrative. The narrative component requires judgment.",
+   deps:[{n:"Google Drive",s:"confirmed"},{n:"Pricing doc",s:"confirmed"}],
    why:"Drive RAG + a pricing doc. No connector beyond Drive. The framing guardrails are just prompt instructions.",
    tip:"Demo the guardrail: ask for pricing without deal context, watch the agent decline and ask for stage first. Audiences love seeing refusal as a feature.",
    conn:"Google Drive (read only)",out:"Slack reply",
    note:"Jaimie, DC, Marilisa all flagged pricing calculator gaps in weekly updates. Instant credibility builder."},
+
   {rank:3,title:"Weekly update drafter",pillar:"Intelligence",tier:"starter",build:1,demo:"high",isNew:false,isLive:false,
+   type:"agent",typeReason:"Synthesizes from multiple sources, makes editorial decisions about what to include, formats for a specific audience. Judgment required.",
+   deps:[{n:"Salesforce",s:"confirmed"}],
    why:"SFDC read (one report query), format into the team's existing check-in template. Single connector, no write-back.",
    tip:"Pull up Peter's real weekly update from last Monday, then show the agent regenerating it from SFDC data in 15 seconds.",
    conn:"Salesforce (read)",out:"Slack / doc",
    note:"Elli already runs a personal version via Cowork. This standardizes it for the whole team."},
+
   {rank:4,title:"Morning digest",pillar:"Intelligence",tier:"starter",build:2,demo:"high",isNew:false,isLive:true,
+   type:"agent",typeReason:"Has a goal (surface what needs attention today), makes prioritization decisions, pulls from multiple sources, produces shaped narrative output.",
+   deps:[{n:"Slack",s:"confirmed"},{n:"Google Calendar",s:"confirmed"},{n:"Salesforce",s:"confirmed"}],
    why:"Slack + GCal reads only. Ethem has 4 live variants. Most proven pattern on the team.",
    tip:"Run a live demo at 8am on demo day. Agent reads the channel, surfaces 3 flagged items. Instant 'I want that' reaction.",
    conn:"Slack + GCal + Salesforce (read)",out:"Slack reply",
    note:"Ethem's Agents 3 and 4 are doing this now. Present as the team-wide standard built on his pattern."},
+
   {rank:5,title:"MQL flag (read-only)",pillar:"Cross-fn",tier:"starter",build:2,demo:"high",isNew:true,isLive:false,
+   type:"skill",typeReason:"Domain filter applied to a list. Rule-based, deterministic, read-only. Either a domain is on the blocklist or it isn't. No judgment.",
+   deps:[{n:"Salesforce",s:"confirmed"}],
    why:"SFDC read + a domain blocklist in the prompt. No write-back required or possible. Pure filter logic.",
    tip:"Show the raw MQL list, then the filtered output with gmail/naver/yahoo stripped and a count. Before/after contrast is immediate.",
    conn:"Salesforce (read only — ceiling confirmed)",out:"Slack list to PSM",
    note:"DC flagged this in the AI Week thread. Document the read-only ceiling explicitly so the team understands why."},
+
   {rank:6,title:"Partner profile",pillar:"Partner Perf",tier:"starter",build:2,demo:"med",isNew:false,isLive:false,
+   type:"skill",typeReason:"Structured data retrieval and formatting from SFDC. Returns a consistent schema every time. No judgment — called by other sub-agents.",
+   deps:[{n:"Salesforce",s:"confirmed"}],
    why:"SFDC read query on a partner account. Format BOB, pipeline, customer count. No logic needed, just structure.",
    tip:"Ask 'show me Merkle's profile' and watch it assemble in real time. Audience already knows Merkle — name recognition drives impact.",
    conn:"Salesforce (read)",out:"Slack reply",
    note:"Jaimie and Chayter both do Merkle QBR prep manually. Direct time-save."},
+
   {rank:7,title:"Exec roll-up",pillar:"Intelligence",tier:"starter",build:2,demo:"high",isNew:false,isLive:false,
+   type:"skill",typeReason:"A formatting and reshaping operation applied to output from other sub-agents. Takes existing output and transforms it by audience level — no new retrieval or judgment.",
+   deps:[{n:"Salesforce",s:"confirmed"}],
    why:"Same SFDC query as bookings, reshaped by audience_level param. The reshaping logic is a prompt instruction, not code.",
    tip:"Run the same query twice: once as IC, once 'for Peter'. Show the format shift. Audiences love seeing data reframed without extra work.",
    conn:"Salesforce (read)",out:"Structured doc",
    note:"Peter explicitly asked Courtney for an AI workflow to do exactly this."},
+
   {rank:8,title:"Cert tracker",pillar:"Partner Perf",tier:"starter",build:2,demo:"med",isNew:false,isLive:false,
+   type:"skill",typeReason:"Reads cert data, applies an expiry threshold rule, generates an alert. Deterministic — no judgment about what to do, just whether the threshold is triggered.",
+   deps:[{n:"Salesforce",s:"confirmed"},{n:"Google Drive",s:"confirmed"}],
    why:"SFDC or Drive read for cert data. Kelly already tracks this in a spreadsheet — agent just reads and alerts.",
    tip:"Show a list of partners with expiring certs and the Slack alert it sends. Kelly's '17 certified in 2025, target 5x' stat makes the stakes tangible.",
    conn:"Salesforce / Drive (read)",out:"Slack alert",
    note:"Kelly explicitly said she wants an agent to report on certification completion. Build exactly that."},
+
   {rank:9,title:"Deal note capture",pillar:"Deal & Pipeline",tier:"medium",build:3,demo:"high",isNew:false,isLive:false,
+   type:"skill",typeReason:"Slack trigger → parse note → write to SFDC field. Deterministic pipeline. If the write succeeds, it worked. No judgment.",
+   deps:[{n:"Slack",s:"confirmed"},{n:"Salesforce (write)",s:"confirmed"}],
    why:"Slack trigger → SFDC write. One write-back scoped to a single field. Hardest part is the SFDC write permission.",
    tip:"Type a deal update in Slack, show it appearing in SFDC 5 seconds later. No login, no copy-paste. Most visceral demo on the list.",
    conn:"Slack (trigger) + Salesforce (write)",out:"SFDC record",
    note:"Mentioned in context notes as a top team pain point. Highest demo-to-effort ratio in the medium tier."},
+
   {rank:10,title:"Stale triage",pillar:"Deal & Pipeline",tier:"medium",build:3,demo:"high",isNew:false,isLive:true,
+   type:"agent",typeReason:"Must identify which deals are stale, assess which warrant action vs. closure, and generate specific next-action recommendations. Judgment at each step.",
+   deps:[{n:"Salesforce",s:"confirmed"},{n:"Slack",s:"confirmed"}],
    why:"SFDC read for S0/S1 report + Slack alert. Courtney sends this manually every Tuesday. Agent automates it and adds next-action recs.",
    tip:"Show Courtney's Tuesday bot message alongside the agent's version with added recommendations. Side-by-side contrast is the story.",
    conn:"Salesforce (read)",out:"Slack alert",
    note:"Courtney's 'Stale S0s Triage Tuesday' message is literally the template. Build from that."},
+
   {rank:11,title:"Bookings query",pillar:"Intelligence",tier:"medium",build:3,demo:"med",isNew:false,isLive:true,
+   type:"skill",typeReason:"Deterministic data retrieval with time range logic. You ask for a number, it returns a number. Called by other sub-agents or directly. No judgment.",
+   deps:[{n:"Salesforce",s:"confirmed"},{n:"Amp on Amp",s:"confirmed"}],
    why:"SFDC read + time range logic. Ethem already does a version. Complexity is in the time range engine (YoY, QTD, custom).",
    tip:"Ask 'AMER new bookings vs same quarter last year?' Watch it pull and compare. The YoY comparison is the money shot.",
    conn:"Salesforce + Amp on Amp (read)",out:"Slack reply",
    note:"Ethem's Agent 1 does daily ARR email. This is the on-demand query version."},
+
   {rank:12,title:"Renewal cadence",pillar:"Partner Perf",tier:"medium",build:3,demo:"high",isNew:true,isLive:false,
+   type:"agent",typeReason:"Must assess health data, infer churn cause, reason about intervention capability, and produce a prioritized recommendation. Most judgment-intensive item in its pillar.",
+   deps:[{n:"Amp on Amp",s:"confirmed"},{n:"Salesforce",s:"confirmed"},{n:"Slack (signals)",s:"confirmed"}],
    why:"Amp-on-Amp (health scores) + SFDC (renewal dates). Both confirmed. Complexity is the intervention logic prompt.",
    tip:"Show a red-health account: agent recommends 'branch out across org — EB departed'. Show a bankrupt account: 'predict churn, move on'. The reasoning is what impresses.",
    conn:"Amp on Amp + Salesforce (read)",out:"Slack digest",
    note:"DC asked for 'account health check' in his AI Week thread. This is the direct answer."},
+
   {rank:13,title:"Capabilities map",pillar:"Partner Perf",tier:"medium",build:3,demo:"med",isNew:false,isLive:false,
+   type:"skill",typeReason:"Structured retrieval from SFDC and Drive, returned in a consistent format. Called by Best partner fit sub-agent. No judgment of its own.",
+   deps:[{n:"Salesforce",s:"confirmed"},{n:"Google Drive",s:"confirmed"}],
    why:"Drive + SFDC read. Complexity is joining company-level and individual-level capability data into one view.",
    tip:"Ask 'who on the Converteo team is certified in experimentation?' Show results by person and competency. Specific names drive the demo.",
    conn:"Salesforce + Google Drive (read)",out:"Slack reply",
    note:"Kelly's cert tracker spreadsheet is the seed data. Pair this with Cert tracker."},
+
   {rank:14,title:"Co-sell health",pillar:"Co-sell Collab",tier:"medium",build:3,demo:"med",isNew:false,isLive:false,
+   type:"agent",typeReason:"Must synthesize signals across systems, assess recency and quality, and produce a prioritized health assessment. Judgment required to define 'joint engagement'.",
+   deps:[{n:"Salesforce",s:"confirmed"},{n:"Slack",s:"confirmed"}],
    why:"SFDC + Slack read for engagement signals. Complexity is defining 'joint engagement' in the prompt.",
    tip:"Pull a co-sell deal and show last Slack mention, last SFDC activity, and partner last login as a single recency snapshot.",
    conn:"Salesforce + Slack (read)",out:"Slack reply",
    note:""},
+
   {rank:15,title:"Promos & credits",pillar:"Deal & Pipeline",tier:"medium",build:3,demo:"med",isNew:false,isLive:false,
+   type:"skill",typeReason:"Eligibility lookup against a matrix. Rule-based — either eligible or not, with the reason cited. No judgment beyond applying the rule.",
+   deps:[{n:"Google Drive",s:"confirmed"},{n:"Salesforce",s:"confirmed"}],
    why:"Drive RAG on an eligibility matrix doc. Medium because wrong answers in a demo kill trust — prompt needs to be precise.",
    tip:"Ask 'is this deal eligible for AWS credits?' Watch agent cite the specific criteria. Citation builds more trust than a plain yes/no.",
    conn:"Google Drive + Salesforce (read)",out:"Slack reply",
    note:"Kim flagged MPOPP vs WMP confusion repeatedly. This resolves it for the whole team."},
+
   {rank:16,title:"Best partner fit",pillar:"Partner Perf",tier:"medium",build:4,demo:"high",isNew:false,isLive:false,
+   type:"agent",typeReason:"Has a goal (recommend the right partner for a given account), must reason across segment, use case, and relationship signals. Judgment required.",
+   deps:[{n:"Crossbeam",s:"confirmed"},{n:"Salesforce",s:"confirmed"},{n:"Google Drive",s:"confirmed"}],
    why:"Crossbeam + SFDC + Drive RAG. Three connectors, all read-only. Complexity is the matching logic across segment/use case/relationship signals.",
    tip:"Drop in a real prospect, watch the agent recommend a partner with reasoning. 'Startup + complex workflow redesign → workflow partner' is your demo script.",
    conn:"Crossbeam + Salesforce + Drive (read)",out:"Slack reply",
    note:"Edwin asked for 'how to find new and best contributing partners' in his AI Week ideas. This is exactly that."},
+
   {rank:17,title:"AE account match",pillar:"Partner Perf",tier:"medium",build:4,demo:"high",isNew:false,isLive:false,
+   type:"agent",typeReason:"Goal-directed: identify accounts where partner relationships create opportunity. Reasons across TpARR priority and Crossbeam relationship depth.",
+   deps:[{n:"Salesforce",s:"confirmed"},{n:"Crossbeam",s:"confirmed"}],
    why:"SFDC + Crossbeam. Complexity is joining TpARR ranking with relationship depth from Crossbeam.",
    tip:"Ask 'which of Tod's A+ accounts have partners with strong relationships?' — use a real AE name. Specificity makes the demo feel real.",
    conn:"Salesforce + Crossbeam (read)",out:"Slack reply",
    note:"Edwin and Perri both thinking about account-partner matching. Strong AMER + EMEA parallel build."},
+
   {rank:18,title:"Forecast roll-up",pillar:"Deal & Pipeline",tier:"harder",build:4,demo:"high",isNew:false,isLive:false,
+   type:"agent",typeReason:"Applies a math model, then opens a PSM judgment override layer, then formats for audience. Three distinct reasoning steps — definitionally a sub-agent.",
+   deps:[{n:"Salesforce",s:"confirmed"}],
    why:"SFDC + math model (commit/strong upside/upside weighting) + PSM judgment override. Three moving parts.",
    tip:"Show raw SFDC data → weighted mathematical forecast → PSM override ('bumping this upside because I know the champion'). Three steps, one screen.",
    conn:"Salesforce (read)",out:"Structured doc",
    note:"Peter's recommended build. Highest strategic value. Elli already does a manual version in a spreadsheet."},
+
   {rank:19,title:"MDF & payments",pillar:"Cross-fn",tier:"harder",build:4,demo:"med",isNew:false,isLive:false,
+   type:"agent",typeReason:"Handles a range of payment questions where the right answer depends on partner type, direction, and status. Context-dependent enough to require a sub-agent.",
+   deps:[{n:"Salesforce",s:"confirmed"},{n:"Finance system",s:"uncertain"}],
    why:"SFDC + Finance system. Complexity is accessing MDF balance and request status — may require Ops involvement to unlock.",
    tip:"Show a partner's MDF balance and open requests in one query. Courtney's manual workflow is the before state.",
    conn:"Salesforce + Finance (read)",out:"Slack reply",
    note:""},
+
   {rank:20,title:"Referral payments",pillar:"Cross-fn",tier:"harder",build:4,demo:"med",isNew:true,isLive:false,
+   type:"skill",typeReason:"Status lookup against SFDC and Tipalti for a specific deal or partner. Returns a structured status. Deterministic once the lookup is defined.",
+   deps:[{n:"Salesforce",s:"confirmed"},{n:"Tipalti",s:"uncertain"}],
    why:"SFDC + Tipalti (uncertain). Falls back to SFDC closed deal amounts only if Tipalti unavailable.",
    tip:"Show bidirectional: 'what do we owe Twilio?' and 'what does Adswerve still owe us?' in the same query. The bidirectional framing is novel.",
    conn:"Salesforce + Tipalti (uncertain — validate Phase 1)",out:"Slack reply",
    note:"Ethem surfaced the exact five payment jobs in Slack. Shay Casey's Q2 payment update is the historical template."},
+
   {rank:21,title:"Joint acct planning",pillar:"Co-sell Collab",tier:"harder",build:4,demo:"high",isNew:false,isLive:false,
+   type:"agent",typeReason:"Must pull the right historical context, assess relevance for this specific account, and populate a template with judgment about what to emphasize.",
+   deps:[{n:"Salesforce",s:"confirmed"},{n:"Google Drive",s:"confirmed"}],
    why:"SFDC read + template pre-fill. Complexity is pulling the right deal history and formatting into the JAP template correctly.",
    tip:"Open a blank JAP template, run the agent, watch it populate with real deal data. The visual fill-in is the demo — 30 seconds.",
    conn:"Salesforce (read) + Google Drive",out:"Document",
    note:"Mentioned in original context notes as a key AE workflow to automate."},
+
   {rank:22,title:"Call notes ingestion",pillar:"Co-sell Collab",tier:"harder",build:5,demo:"high",isNew:false,isLive:false,
+   type:"skill",typeReason:"Transcript → parse → extract structured fields → write to SFDC. Deterministic pipeline. The structure of the output is predefined. No judgment.",
+   deps:[{n:"Granola",s:"confirmed"},{n:"Zoom",s:"uncertain"},{n:"Salesforce (write)",s:"confirmed"}],
    why:"Granola MCP + SFDC write. Two connectors plus write-back. Granola confirmed, Zoom uncertain.",
    tip:"Play 30 seconds of a Granola transcript, then show the structured SFDC activity record the agent created. Speed of capture is the story.",
    conn:"Granola / Zoom + Salesforce (write)",out:"SFDC record",
    note:"Tim Hughes already wiring partner integrations into demo environments. Natural collaboration opportunity."},
+
   {rank:23,title:"Deal reg validation",pillar:"Co-sell Collab",tier:"harder",build:5,demo:"med",isNew:false,isLive:false,
+   type:"agent",typeReason:"Applies MEDDPICC scoring, identifies gaps, makes a routing decision (AE vs. RSD vs. Ops), and drafts a specific ask. Multiple judgment steps.",
+   deps:[{n:"Salesforce",s:"confirmed"},{n:"Routing logic",s:"confirmed"}],
    why:"SFDC read + MEDDPICC scoring logic + routing workflow to AE/RSD/Ops. Three layers of logic.",
    tip:"Submit a thin deal reg, watch the agent score it, flag gaps, and route to AE with a specific ask. The routing chain is what makes it feel like a real workflow.",
    conn:"Salesforce (read) + routing logic",out:"Slack + SFDC",
    note:"Jaimie flagged retrodating and deal reg questions in weekly updates. Real ongoing pain."},
+
   {rank:24,title:"DR workflow & routing",pillar:"Co-sell Collab",tier:"harder",build:5,demo:"med",isNew:false,isLive:false,
+   type:"skill",typeReason:"Once the validation decision is made by the sub-agent above, this is the execution of the routing — send to the right person with the right message. Deterministic if the decision has already been made.",
+   deps:[{n:"Salesforce",s:"confirmed"},{n:"Slack (write)",s:"confirmed"}],
    why:"Depends on deal reg validation being built first. Complexity is the conditional AE → RSD → Ops escalation tree.",
    tip:"Show a rejected DR and the auto-drafted escalation Slack message with context. The generated escalation note is the demo moment.",
    conn:"Salesforce (read) + Slack (write)",out:"Slack routing message",
    note:"Best built as a Phase 2 extension of deal reg validation, not standalone."},
 ];
 
+// ── STATE ─────────────────────────────────────────────────────────────
 const TIER_LABELS = {
   starter:"Tier 1 — Starter  (build in a day)",
   medium:"Tier 2 — Medium  (2–3 days)",
   harder:"Tier 3 — Harder  (3–5 days or post-AI Week)"
 };
 const BUILD_LABEL = ["","Very easy","Easy","Medium","Hard","Complex"];
-const BUILD_CLS = ["","p-b1","p-b2","p-b3","p-b4","p-b5"];
+const BUILD_CLS   = ["","p-b1","p-b2","p-b3","p-b4","p-b5"];
 const BUILD_COLOR = ["","#3B6D11","#0F6E56","#854F0B","#993C1D","#791F1F"];
-const DEMO_CLS = {high:"p-dh",med:"p-dm",low:"p-dl"};
+const DEMO_CLS    = {high:"p-dh",med:"p-dm",low:"p-dl"};
 
-let activeFilter = "all";
-let expandedRank = null;
+let activeFilter  = "all";
+let expandedRank  = null;
+
+// claimed state: rank → owner name
+const claimed = {};
+
+function getClaimName() {
+  return document.getElementById("claimName").value.trim();
+}
+
+function updateClaimHint() {
+  const n = getClaimName();
+  const hint = document.getElementById("claimHint");
+  hint.textContent = n
+    ? `Checking a box will claim that item for ${n}`
+    : "Enter your name, then check a box to claim an item";
+}
+
+function handleClaim(rank, checked, e) {
+  e.stopPropagation();
+  const name = getClaimName();
+  if (checked && !name) {
+    alert("Enter your name above before claiming an item.");
+    e.target.checked = false;
+    return;
+  }
+  if (checked) {
+    claimed[rank] = name;
+  } else {
+    delete claimed[rank];
+  }
+  updateSummary();
+  render();
+}
+
+function updateSummary() {
+  const total = A.length;
+  const claimedCount = Object.keys(claimed).length;
+  const open = total - claimedCount;
+  const agents = A.filter(a => a.type === "agent").length;
+  const skills = A.filter(a => a.type === "skill").length;
+  document.getElementById("s-total").textContent   = total;
+  document.getElementById("s-claimed").textContent = claimedCount;
+  document.getElementById("s-open").textContent    = open;
+  document.getElementById("s-agent").textContent   = agents;
+  document.getElementById("s-skill").textContent   = skills;
+}
 
 function setFilter(f, btn) {
   activeFilter = f;
-  document.querySelectorAll(".fbtn").forEach(b => b.classList.remove("active"));
-  btn.classList.add("active");
+  document.querySelectorAll(".fbtn").forEach(b => {
+    b.classList.remove("active","active-open","active-claimed");
+  });
+  if (f === "open")    btn.classList.add("active-open");
+  else if (f === "claimed") btn.classList.add("active-claimed");
+  else                 btn.classList.add("active");
   render();
 }
 
@@ -214,30 +438,60 @@ function toggle(rank) {
 }
 
 function visible(a) {
-  if (activeFilter === "all") return true;
-  if (activeFilter === "starter") return a.tier === "starter";
-  if (activeFilter === "medium") return a.tier === "medium";
-  if (activeFilter === "harder") return a.tier === "harder";
+  if (activeFilter === "all")       return true;
+  if (activeFilter === "starter")   return a.tier === "starter";
+  if (activeFilter === "medium")    return a.tier === "medium";
+  if (activeFilter === "harder")    return a.tier === "harder";
   if (activeFilter === "high-demo") return a.demo === "high";
-  if (activeFilter === "new") return a.isNew;
-  if (activeFilter === "live") return a.isLive;
+  if (activeFilter === "new")       return a.isNew;
+  if (activeFilter === "live")      return a.isLive;
+  if (activeFilter === "agent")     return a.type === "agent";
+  if (activeFilter === "skill")     return a.type === "skill";
+  if (activeFilter === "open")      return !claimed[a.rank];
+  if (activeFilter === "claimed")   return !!claimed[a.rank];
   return true;
 }
 
+function depChip(dep) {
+  const cls = dep.s === "confirmed" ? "dep-confirmed"
+            : dep.s === "uncertain" ? "dep-uncertain"
+            : "dep-none";
+  const icon = dep.s === "confirmed" ? "✓ " : dep.s === "uncertain" ? "? " : "";
+  return `<span class="dep-chip ${cls}">${icon}${dep.n}</span>`;
+}
+
 function card(a) {
-  const exp = expandedRank === a.rank;
-  const vis = visible(a);
-  const demoW = a.demo === "high" ? 48 : a.demo === "med" ? 29 : 10;
-  const buildW = Math.round((a.build / 5) * 48);
-  return `<div class="card${exp?" expanded":""}${!vis?" hidden":""}" onclick="toggle(${a.rank})">
+  const exp      = expandedRank === a.rank;
+  const vis      = visible(a);
+  const isClaimed = !!claimed[a.rank];
+  const owner    = claimed[a.rank] || "";
+  const demoW    = a.demo === "high" ? 48 : a.demo === "med" ? 29 : 10;
+  const buildW   = Math.round((a.build / 5) * 48);
+  const typePill = a.type === "agent"
+    ? `<span class="pill p-agent">Sub-agent</span>`
+    : `<span class="pill p-skill">Skill</span>`;
+
+  return `<div class="card${exp?" expanded":""}${isClaimed?" claimed":""}${!vis?" hidden":""}">
+  <div class="cb-col">
+    <div class="cb-wrap">
+      <input type="checkbox" ${isClaimed?"checked":""} onchange="handleClaim(${a.rank},this.checked,event)" title="${isClaimed?'Claimed by '+owner:'Claim this item for AI Week'}">
+      <div class="cb-box">
+        <svg class="cb-check" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M1.5 5L4 7.5L8.5 2.5" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+    </div>
+    <div class="owner-badge ${isClaimed?'visible':''}">${owner}</div>
+  </div>
   <div class="rank">${a.rank}</div>
-  <div>
+  <div class="card-clickable" onclick="toggle(${a.rank})">
     <div class="card-title">${a.title}</div>
     <div class="pills">
       <span class="pill p-pillar">${a.pillar}</span>
+      ${typePill}
       <span class="pill ${BUILD_CLS[a.build]}">${BUILD_LABEL[a.build]}</span>
       <span class="pill ${DEMO_CLS[a.demo]}">Demo: ${a.demo}</span>
-      ${a.isNew?`<span class="pill p-new">new v3</span>`:""}
+      ${a.isNew ?`<span class="pill p-new">new v3</span>`:""}
       ${a.isLive?`<span class="pill p-live">already live</span>`:""}
     </div>
   </div>
@@ -245,12 +499,23 @@ function card(a) {
     <div class="srow"><span class="slabel">build</span><div class="strack"><div class="sfill" style="width:${buildW}px;background:${BUILD_COLOR[a.build]}"></div></div></div>
     <div class="srow"><span class="slabel">demo</span><div class="strack"><div class="sfill" style="width:${demoW}px;background:${a.demo==="high"?"#534AB7":a.demo==="med"?"#185FA5":"#888780"}"></div></div></div>
   </div>
+  ${isClaimed?`<div class="claimed-banner">Claimed by ${owner} for AI Week</div>`:""}
   <div class="detail">
     <div class="dgrid">
       <div class="dblock"><div class="dlabel">Why this difficulty</div><div class="dtext">${a.why}</div></div>
       <div class="dblock"><div class="dlabel">Demo tip</div><div class="dtext">${a.tip}</div></div>
       <div class="dblock"><div class="dlabel">Connectors</div><div class="dtext">${a.conn}</div></div>
       <div class="dblock"><div class="dlabel">Output</div><div class="dtext">${a.out}</div></div>
+    </div>
+    <div class="deps-block">
+      <div class="dlabel">Key data dependencies</div>
+      <div class="deps-list">${a.deps.map(depChip).join("")}</div>
+    </div>
+    <div class="type-block is-${a.type}">
+      <div>
+        <div class="type-block-label">${a.type === "agent" ? "Sub-agent" : "Skill"}</div>
+        <div class="type-block-text">${a.typeReason}</div>
+      </div>
     </div>
     ${a.note?`<div class="team-note">${a.note}</div>`:""}
   </div>
@@ -270,6 +535,7 @@ function render() {
   document.getElementById("root").innerHTML = html;
 }
 
+updateSummary();
 render();
 </script>
 </body>
