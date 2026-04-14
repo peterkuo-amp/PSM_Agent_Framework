@@ -3,13 +3,36 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PSM Sub-agent Priority Guide — AI Week</title>
+<title>PSM Sub-agent + Skill Priority Guide v3</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:'DM Sans',sans-serif;background:#FAFAF8;padding:24px 20px 48px;color:#1A1A18;max-width:960px;margin:0 auto;}
+body{font-family:'DM Sans',sans-serif;background:#FAFAF8;padding:24px 20px 48px;color:#1A1A18;max-width:1040px;margin:0 auto;}
 h1{font-size:22px;font-weight:700;color:#1A1A18;margin-bottom:3px;}
-.sub{font-size:12px;color:#888780;margin-bottom:18px;}
+.sub{font-size:12px;color:#888780;margin-bottom:16px;}
+
+/* View toggle */
+.view-toggle{display:flex;gap:6px;margin-bottom:16px;}
+.vtbtn{padding:6px 14px;border-radius:7px;border:1px solid #E0DED7;background:#fff;cursor:pointer;font-size:11px;font-weight:600;font-family:'DM Sans',sans-serif;color:#5F5E5A;transition:all .15s;display:flex;align-items:center;gap:5px;}
+.vtbtn:hover{border-color:#C8C6BE;}
+.vtbtn.active{border-color:#534AB7;background:#EEEDFE;color:#3C3489;}
+
+/* Claim row */
+.claim-row{display:flex;align-items:center;gap:8px;margin-bottom:16px;padding:10px 14px;background:#fff;border:0.5px solid #E8E6E0;border-radius:8px;flex-wrap:wrap;}
+.claim-row label{font-size:11px;color:#5F5E5A;white-space:nowrap;}
+.claim-row input[type="text"]{border:0.5px solid #E0DED7;border-radius:5px;padding:5px 9px;font-size:11px;font-family:'DM Sans',sans-serif;color:#1A1A18;background:#FAFAF8;outline:none;width:180px;}
+.claim-row input[type="text"]:focus{border-color:#534AB7;}
+.claim-row .claim-hint{font-size:10px;color:#B4B2A9;font-style:italic;}
+
+/* Summary */
+.summary-bar{display:flex;gap:16px;padding:10px 14px;background:#fff;border:0.5px solid #E8E6E0;border-radius:8px;margin-bottom:16px;flex-wrap:wrap;}
+.stat{display:flex;flex-direction:column;gap:1px;}
+.stat-val{font-size:18px;font-weight:700;color:#1A1A18;font-family:'DM Mono',monospace;}
+.stat-label{font-size:10px;color:#888780;}
+.stat-val.green{color:#27500A;}
+.stat-val.amber{color:#854F0B;}
+
+/* Filter bar */
 .filter-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;}
 .filter-group-label{font-size:9px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:#B4B2A9;font-family:'DM Mono',monospace;margin-bottom:5px;margin-top:10px;}
 .fbtn{padding:5px 12px;border-radius:6px;border:1px solid #E0DED7;background:#fff;cursor:pointer;font-size:11px;font-weight:500;font-family:'DM Sans',sans-serif;color:#5F5E5A;transition:all .15s;}
@@ -17,41 +40,20 @@ h1{font-size:22px;font-weight:700;color:#1A1A18;margin-bottom:3px;}
 .fbtn.active{border-color:#534AB7;background:#EEEDFE;color:#3C3489;}
 .fbtn.active-open{border-color:#27500A;background:#EAF3DE;color:#27500A;}
 .fbtn.active-claimed{border-color:#993C1D;background:#FAECE7;color:#712B13;}
-/* Setup panel */
-.setup-panel{background:#fff;border:1px solid #EF9F27;border-radius:10px;padding:16px 18px;margin-bottom:18px;}
-.setup-panel.hidden{display:none;}
-.setup-title{font-size:13px;font-weight:600;color:#633806;margin-bottom:10px;}
-.setup-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
-.setup-field label{font-size:11px;color:#5F5E5A;display:block;margin-bottom:4px;}
-.setup-field input{width:100%;border:0.5px solid #E0DED7;border-radius:5px;padding:6px 9px;font-size:11px;font-family:'DM Sans',sans-serif;color:#1A1A18;background:#FAFAF8;outline:none;}
-.setup-field input:focus{border-color:#534AB7;}
-.setup-field input.mono{font-family:'DM Mono',monospace;font-size:10px;}
-.setup-actions{display:flex;gap:8px;margin-top:12px;align-items:center;}
-.btn-save{padding:6px 16px;border-radius:6px;border:none;background:#534AB7;color:#fff;cursor:pointer;font-size:11px;font-weight:600;font-family:'DM Sans',sans-serif;}
-.btn-save:hover{background:#3C3489;}
-.btn-clear{padding:6px 12px;border-radius:6px;border:1px solid #E0DED7;background:#fff;color:#5F5E5A;cursor:pointer;font-size:11px;font-family:'DM Sans',sans-serif;}
-.setup-status{font-size:11px;color:#888780;font-style:italic;}
-.setup-status.ok{color:#27500A;}.setup-status.err{color:#993C1D;}
-/* Claim row */
-.claim-row{display:flex;align-items:center;gap:8px;margin-bottom:18px;padding:10px 14px;background:#fff;border:0.5px solid #E8E6E0;border-radius:8px;flex-wrap:wrap;}
-.claim-row label{font-size:11px;color:#5F5E5A;white-space:nowrap;}
-.claim-row input[type="text"]{border:0.5px solid #E0DED7;border-radius:5px;padding:5px 9px;font-size:11px;font-family:'DM Sans',sans-serif;color:#1A1A18;background:#FAFAF8;outline:none;width:180px;}
-.claim-row input[type="text"]:focus{border-color:#534AB7;}
-.claim-row .claim-hint{font-size:10px;color:#B4B2A9;font-style:italic;}
-.btn-config{padding:5px 10px;border-radius:5px;border:1px solid #E0DED7;background:#fff;cursor:pointer;font-size:10px;color:#888780;font-family:'DM Sans',sans-serif;margin-left:auto;}
-.btn-config:hover{border-color:#534AB7;color:#534AB7;}
-/* Summary */
-.summary-bar{display:flex;gap:16px;padding:10px 14px;background:#fff;border:0.5px solid #E8E6E0;border-radius:8px;margin-bottom:16px;flex-wrap:wrap;align-items:center;}
-.stat{display:flex;flex-direction:column;gap:1px;}
-.stat-val{font-size:18px;font-weight:700;color:#1A1A18;font-family:'DM Mono',monospace;}
-.stat-label{font-size:10px;color:#888780;}
-.stat-val.green{color:#27500A;}.stat-val.amber{color:#854F0B;}
-.sync-status{margin-left:auto;font-size:10px;color:#B4B2A9;font-style:italic;display:flex;align-items:center;gap:4px;}
-.sync-dot{width:6px;height:6px;border-radius:50%;background:#B4B2A9;flex-shrink:0;}
-.sync-dot.ok{background:#3B6D11;}.sync-dot.err{background:#993C1D;}
-.sync-dot.loading{background:#EF9F27;animation:pulse 1s infinite;}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
-/* Tier + cards */
+
+/* Branch filter pills — each branch gets its own color */
+.fbtn.br-daily{border-color:#185FA5;color:#0C447C;}
+.fbtn.br-daily.active{background:#E6F1FB;border-color:#185FA5;color:#0C447C;}
+.fbtn.br-perf{border-color:#993C1D;color:#712B13;}
+.fbtn.br-perf.active{background:#FAECE7;border-color:#993C1D;color:#712B13;}
+.fbtn.br-deal{border-color:#854F0B;color:#633806;}
+.fbtn.br-deal.active{background:#FAEEDA;border-color:#854F0B;color:#633806;}
+.fbtn.br-cosell{border-color:#993556;color:#72243E;}
+.fbtn.br-cosell.active{background:#FBEAF0;border-color:#993556;color:#72243E;}
+.fbtn.br-xfn{border-color:#3B6D11;color:#27500A;}
+.fbtn.br-xfn.active{background:#EAF3DE;border-color:#3B6D11;color:#27500A;}
+
+/* ── LIST VIEW ── */
 .tier-label{font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:#B4B2A9;font-family:'DM Mono',monospace;margin:20px 0 8px;padding-bottom:5px;border-bottom:1px solid #F0EEE8;}
 .cards{display:flex;flex-direction:column;gap:7px;}
 .card{display:grid;grid-template-columns:32px 28px 1fr auto;gap:0 10px;align-items:start;padding:11px 14px;background:#fff;border:0.5px solid #E8E6E0;border-radius:10px;transition:border-color .15s,box-shadow .15s;position:relative;}
@@ -70,16 +72,22 @@ h1{font-size:22px;font-weight:700;color:#1A1A18;margin-bottom:3px;}
 .owner-badge.visible{display:block;}
 .rank{font-size:12px;font-weight:700;color:#C8C6BE;text-align:center;padding-top:2px;font-family:'DM Mono',monospace;}
 .card-clickable{cursor:pointer;}
-.card-title{font-size:13px;font-weight:600;color:#1A1A18;line-height:1.3;margin-bottom:5px;}
+.card-title{font-size:13px;font-weight:600;color:#1A1A18;line-height:1.3;margin-bottom:3px;}
+.card-desc{font-size:11px;color:#5F5E5A;line-height:1.5;margin-bottom:5px;}
 .pills{display:flex;flex-wrap:wrap;gap:4px;}
 .pill{padding:2px 7px;border-radius:4px;font-size:10px;font-weight:500;white-space:nowrap;}
 .p-pillar{background:#F1EFE8;color:#5F5E5A;}
 .p-b1{background:#EAF3DE;color:#27500A;}.p-b2{background:#E1F5EE;color:#085041;}.p-b3{background:#FAEEDA;color:#633806;}.p-b4{background:#FAECE7;color:#712B13;}.p-b5{background:#FCEBEB;color:#791F1F;}
-.p-dh{background:#EEEDFE;color:#3C3489;}.p-dm{background:#E6F1FB;color:#0C447C;}.p-dl{background:#F1EFE8;color:#444441;}
 .p-new{background:#FFF8E1;color:#633806;border:1px dashed #BA7517;}
 .p-live{background:#EAF3DE;color:#27500A;border:1px solid #97C459;}
 .p-agent{background:#EEEDFE;color:#3C3489;border:1px solid #AFA9EC;}
 .p-skill{background:#F1EFE8;color:#444441;border:1px solid #B4B2A9;}
+/* Branch pills */
+.p-br-daily{background:#E6F1FB;color:#0C447C;}
+.p-br-perf{background:#FAECE7;color:#712B13;}
+.p-br-deal{background:#FAEEDA;color:#633806;}
+.p-br-cosell{background:#FBEAF0;color:#72243E;}
+.p-br-xfn{background:#EAF3DE;color:#27500A;}
 .scores{display:flex;flex-direction:column;gap:4px;min-width:58px;padding-top:2px;}
 .srow{display:flex;align-items:center;gap:4px;}
 .slabel{font-size:9px;color:#B4B2A9;font-family:'DM Mono',monospace;min-width:26px;text-align:right;}
@@ -96,8 +104,10 @@ h1{font-size:22px;font-weight:700;color:#1A1A18;margin-bottom:3px;}
 .dep-chip{padding:2px 8px;border-radius:4px;font-size:10px;font-weight:500;border:0.5px solid;}
 .dep-confirmed{background:#EAF3DE;color:#27500A;border-color:#97C459;}
 .dep-uncertain{background:#FFF8E1;color:#633806;border-color:#EF9F27;}
+.dep-skill{background:#EEEDFE;color:#3C3489;border-color:#AFA9EC;cursor:pointer;}
+.dep-skill:hover{background:#D6D3F8;}
 .dep-none{background:#F1EFE8;color:#5F5E5A;border-color:#C8C6BE;}
-.type-block{margin-top:10px;padding:7px 10px;border-radius:6px;display:flex;align-items:flex-start;gap:8px;}
+.type-block{margin-top:10px;padding:7px 10px;border-radius:6px;}
 .type-block.is-agent{background:#EEEDFE30;border-left:2px solid #534AB7;}
 .type-block.is-skill{background:#F1EFE830;border-left:2px solid #5F5E5A;}
 .type-block-label{font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;font-family:'DM Mono',monospace;margin-bottom:2px;}
@@ -106,394 +116,653 @@ h1{font-size:22px;font-weight:700;color:#1A1A18;margin-bottom:3px;}
 .team-note{margin-top:9px;padding:6px 10px;border-left:2px solid #534AB7;background:#EEEDFE18;border-radius:0 5px 5px 0;font-size:11px;color:#534AB7;font-style:italic;}
 .claimed-banner{display:none;grid-column:1/-1;margin-top:6px;padding:5px 10px;background:#EAF3DE;border-radius:5px;font-size:11px;color:#27500A;font-weight:500;}
 .card.claimed .claimed-banner{display:block;}
+
+/* ── TREE VIEW ── */
+/* treeView visibility controlled by JS inline style */
+.tree-branch{margin-bottom:28px;}
+.tree-branch-header{font-size:13px;font-weight:600;color:#1A1A18;margin-bottom:12px;padding:8px 12px;border-radius:8px;display:flex;align-items:center;gap:8px;}
+.tree-branch-header .br-count{font-size:11px;font-weight:400;color:inherit;opacity:.7;}
+.br-hdr-daily{background:#E6F1FB;color:#0C447C;}
+.br-hdr-perf{background:#FAECE7;color:#712B13;}
+.br-hdr-deal{background:#FAEEDA;color:#633806;}
+.br-hdr-cosell{background:#FBEAF0;color:#72243E;}
+.br-hdr-xfn{background:#EAF3DE;color:#27500A;}
+
+/* Tree layout: nodes + edges */
+.tree-nodes{display:flex;flex-direction:column;gap:0;padding-left:20px;border-left:2px solid #F0EEE8;margin-left:8px;}
+.tree-node{position:relative;margin-bottom:8px;}
+.tree-node::before{content:'';position:absolute;left:-20px;top:18px;width:16px;height:2px;background:#F0EEE8;}
+.tree-node-card{display:flex;align-items:flex-start;gap:10px;padding:9px 12px;background:#fff;border:0.5px solid #E8E6E0;border-radius:8px;cursor:pointer;transition:border-color .15s;}
+.tree-node-card:hover{border-color:#C8C6BE;}
+.tree-node-card.has-deps-unbuilt{border-color:#EF9F27;background:#FFFDF7;}
+.tree-node-card.claimed{border-color:#97C459;background:#FAFFF7;}
+.tree-node-info{flex:1;min-width:0;}
+.tree-node-title{font-size:12px;font-weight:600;color:#1A1A18;margin-bottom:2px;}
+.tree-node-desc{font-size:11px;color:#888780;line-height:1.4;}
+.tree-node-pills{display:flex;flex-wrap:wrap;gap:3px;margin-top:4px;}
+.tree-node-pills .pill{font-size:9px;padding:1px 5px;}
+.tree-cb{flex-shrink:0;margin-top:1px;}
+/* Skill dependency sub-nodes (indented children in tree) */
+.tree-children{padding-left:28px;border-left:2px dashed #E8E6E0;margin-left:20px;margin-top:4px;margin-bottom:4px;}
+.tree-child-node{position:relative;margin-bottom:6px;}
+.tree-child-node::before{content:'';position:absolute;left:-20px;top:14px;width:16px;height:2px;background:#E8E6E0;border-top:2px dashed #E8E6E0;}
+.tree-dep-label{font-size:9px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#B4B2A9;font-family:'DM Mono',monospace;margin-bottom:4px;margin-top:6px;display:flex;align-items:center;gap:4px;}
+.dep-warning{display:inline-block;background:#FFF8E1;color:#854F0B;border:1px solid #EF9F27;border-radius:3px;padding:1px 5px;font-size:9px;font-weight:600;}
 </style>
 </head>
 <body>
 
 <h1>PSM Sub-agent + Skill priority guide</h1>
-<div class="sub">24 items · ranked easiest to hardest · click any card to expand · check the box to claim for AI Week · claims persist via Supabase</div>
+<div class="sub">24 items · list view or dependency tree · check a box to claim for AI Week</div>
 
-<!-- ── SETUP PANEL ── -->
-<div class="setup-panel" id="setupPanel">
-  <div class="setup-title">Enter your name to get started</div>
-  <div class="setup-grid" style="grid-template-columns:1fr;max-width:320px">
-    <div class="setup-field">
-      <label>Your name (shown on claims)</label>
-      <input type="text" id="setupName" placeholder="e.g. Ethem, Kelly, DC&hellip;" onkeydown="if(event.key==='Enter')saveConfig()">
-    </div>
-  </div>
-  <div class="setup-actions">
-    <button class="btn-save" onclick="saveConfig()">Start claiming</button>
-    <span class="setup-status" id="setupStatus"></span>
-  </div>
+<!-- View toggle -->
+<div class="view-toggle">
+  <button class="vtbtn active" id="btnList" onclick="setView('list')">
+    <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><rect x="0" y="1" width="13" height="2" rx="1" fill="currentColor"/><rect x="0" y="5.5" width="13" height="2" rx="1" fill="currentColor"/><rect x="0" y="10" width="13" height="2" rx="1" fill="currentColor"/></svg>
+    List view
+  </button>
+  <button class="vtbtn" id="btnTree" onclick="setView('tree')">
+    <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><circle cx="2" cy="2" r="1.5" fill="currentColor"/><circle cx="9" cy="6.5" r="1.5" fill="currentColor"/><circle cx="2" cy="11" r="1.5" fill="currentColor"/><line x1="2" y1="2" x2="9" y2="6.5" stroke="currentColor" stroke-width="1.2"/><line x1="2" y1="11" x2="9" y2="6.5" stroke="currentColor" stroke-width="1.2"/></svg>
+    Dependency tree
+  </button>
 </div>
 
-<!-- ── CLAIM ROW ── -->
-<div class="claim-row" id="claimRow" style="display:none">
-  <label>Claiming as:</label>
-  <strong id="claimNameDisplay" style="font-size:12px;color:#1A1A18;"></strong>
-  <span class="claim-hint">Check a box to claim an item for AI Week</span>
-  <button class="btn-config" onclick="showSetup()">⚙ Config</button>
+<!-- Claim row -->
+<div class="claim-row">
+  <label>Your name (for claiming):</label>
+  <input type="text" id="claimName" placeholder="e.g. Ethem, Kelly, DC…" oninput="updateClaimHint()">
+  <span class="claim-hint" id="claimHint">Enter your name, then check a box to claim an item</span>
 </div>
 
-<!-- ── SUMMARY ── -->
+<!-- Summary bar -->
 <div class="summary-bar">
   <div class="stat"><span class="stat-val" id="s-total">24</span><span class="stat-label">Total</span></div>
   <div class="stat"><span class="stat-val green" id="s-claimed">0</span><span class="stat-label">Claimed</span></div>
   <div class="stat"><span class="stat-val amber" id="s-open">24</span><span class="stat-label">Open</span></div>
   <div class="stat"><span class="stat-val" id="s-agent">—</span><span class="stat-label">Sub-agents</span></div>
   <div class="stat"><span class="stat-val" id="s-skill">—</span><span class="stat-label">Skills</span></div>
-  <div class="sync-status"><div class="sync-dot" id="syncDot"></div><span id="syncMsg">Not connected</span></div>
 </div>
 
-<!-- ── FILTERS ── -->
-<div class="filter-group-label">Filter by tier / property</div>
-<div class="filter-row">
-  <button class="fbtn active" onclick="setFilter('all',this)">All (24)</button>
-  <button class="fbtn" onclick="setFilter('starter',this)">Starter (8)</button>
-  <button class="fbtn" onclick="setFilter('medium',this)">Medium (9)</button>
-  <button class="fbtn" onclick="setFilter('harder',this)">Harder (7)</button>
-  <button class="fbtn" onclick="setFilter('high-demo',this)">High demo impact</button>
-  <button class="fbtn" onclick="setFilter('new',this)">New in v3</button>
-  <button class="fbtn" onclick="setFilter('live',this)">Already live</button>
-</div>
-<div class="filter-group-label">Filter by type</div>
-<div class="filter-row">
-  <button class="fbtn" onclick="setFilter('agent',this)">Sub-agents only</button>
-  <button class="fbtn" onclick="setFilter('skill',this)">Skills only</button>
-</div>
-<div class="filter-group-label">Filter by claim status</div>
-<div class="filter-row">
-  <button class="fbtn" onclick="setFilter('open',this)">Open (unclaimed)</button>
-  <button class="fbtn" onclick="setFilter('claimed',this)">Claimed this week</button>
+<!-- LIST VIEW filters (hidden in tree view) -->
+<div id="listFilters">
+  <div class="filter-group-label">Filter by tier</div>
+  <div class="filter-row">
+    <button class="fbtn active" onclick="setFilter('all',this)">All (24)</button>
+    <button class="fbtn" onclick="setFilter('starter',this)">Starter (8)</button>
+    <button class="fbtn" onclick="setFilter('medium',this)">Medium (9)</button>
+    <button class="fbtn" onclick="setFilter('harder',this)">Harder (7)</button>
+    <button class="fbtn" onclick="setFilter('new',this)">New in v3</button>
+    <button class="fbtn" onclick="setFilter('live',this)">Already live</button>
+  </div>
+  <div class="filter-group-label">Filter by type</div>
+  <div class="filter-row">
+    <button class="fbtn" onclick="setFilter('agent',this)">Sub-agents only</button>
+    <button class="fbtn" onclick="setFilter('skill',this)">Skills only</button>
+  </div>
+  <div class="filter-group-label">Filter by PSM agent branch</div>
+  <div class="filter-row">
+    <button class="fbtn br-daily" onclick="setFilter('br-daily',this)">Daily Prioritization</button>
+    <button class="fbtn br-perf"  onclick="setFilter('br-perf',this)">Partner Performance</button>
+    <button class="fbtn br-deal"  onclick="setFilter('br-deal',this)">Deal &amp; Pipeline Mgmt</button>
+    <button class="fbtn br-cosell" onclick="setFilter('br-cosell',this)">Co-sell Collab Tools</button>
+    <button class="fbtn br-xfn"   onclick="setFilter('br-xfn',this)">Cross-Functional Requests</button>
+  </div>
+  <div class="filter-group-label">Filter by claim status</div>
+  <div class="filter-row">
+    <button class="fbtn" onclick="setFilter('open',this)">Open (unclaimed)</button>
+    <button class="fbtn" onclick="setFilter('claimed',this)">Claimed this week</button>
+  </div>
 </div>
 
-<div id="root" style="margin-top:16px;"></div>
+<div id="listView" style="margin-top:16px;"></div>
+<div id="treeView" style="margin-top:16px;display:none;"></div>
 
 <script>
-// ── AGENT DATA ────────────────────────────────────────────────────────
+// ── DATA ──────────────────────────────────────────────────────────────
+// branch: one of "daily" | "perf" | "deal" | "cosell" | "xfn"
+// skillDeps: ranks of skills that must be built first (creates tree edges)
+// desc: 1-2 sentence description visible on card face
+
 const A = [
-  {rank:1,title:"Business problem narrative",pillar:"Cross-fn",tier:"starter",build:1,demo:"high",isNew:false,isLive:false,type:"agent",typeReason:"Has a goal (frame a compelling client narrative), makes editorial decisions, produces shaped output. Judgment at every section.",deps:[{n:"Google Drive",s:"confirmed"},{n:"Internal KB docs",s:"confirmed"}],why:"Pure prompt + Drive RAG. Zero connectors needed. Write a system prompt, point at a doc folder, done in under an hour.",tip:"Show before/after: type a customer problem, watch structured solution framing appear in 10 seconds.",conn:"Google Drive (read only)",out:"Slack reply",note:"No Slack signal of anyone building this yet — wide open. Perfect for Kelly or Nick."},
-  {rank:2,title:"Pricing + narrative",pillar:"Cross-fn",tier:"starter",build:1,demo:"high",isNew:false,isLive:false,type:"agent",typeReason:"Must assess deal context, retrieve the right pricing tier, and construct a framing narrative. Judgment required.",deps:[{n:"Google Drive",s:"confirmed"},{n:"Pricing doc",s:"confirmed"}],why:"Drive RAG + a pricing doc. No connector beyond Drive.",tip:"Demo the guardrail: ask for pricing without deal context, watch the agent decline.",conn:"Google Drive (read only)",out:"Slack reply",note:"Jaimie, DC, Marilisa all flagged pricing calculator gaps."},
-  {rank:3,title:"Weekly update drafter",pillar:"Intelligence",tier:"starter",build:1,demo:"high",isNew:false,isLive:false,type:"agent",typeReason:"Synthesizes from multiple sources, makes editorial decisions, formats for a specific audience. Judgment required.",deps:[{n:"Salesforce",s:"confirmed"}],why:"SFDC read (one report query), format into the team's existing check-in template.",tip:"Show agent regenerating Peter's weekly update from SFDC data in 15 seconds.",conn:"Salesforce (read)",out:"Slack / doc",note:"Elli already runs a personal version via Cowork."},
-  {rank:4,title:"Morning digest",pillar:"Intelligence",tier:"starter",build:2,demo:"high",isNew:false,isLive:true,type:"agent",typeReason:"Has a goal (surface what needs attention today), makes prioritization decisions, pulls from multiple sources.",deps:[{n:"Slack",s:"confirmed"},{n:"Google Calendar",s:"confirmed"},{n:"Salesforce",s:"confirmed"}],why:"Slack + GCal reads only. Ethem has 4 live variants.",tip:"Run a live demo at 8am on demo day. Instant 'I want that' reaction.",conn:"Slack + GCal + Salesforce (read)",out:"Slack reply",note:"Ethem's Agents 3 and 4 are doing this now."},
-  {rank:5,title:"MQL flag (read-only)",pillar:"Cross-fn",tier:"starter",build:2,demo:"high",isNew:true,isLive:false,type:"skill",typeReason:"Domain filter applied to a list. Rule-based, deterministic, read-only. No judgment.",deps:[{n:"Salesforce",s:"confirmed"}],why:"SFDC read + a domain blocklist in the prompt. Pure filter logic.",tip:"Show raw MQL list then filtered output with gmail/naver/yahoo stripped.",conn:"Salesforce (read only)",out:"Slack list to PSM",note:"DC flagged this in the AI Week thread."},
-  {rank:6,title:"Partner profile",pillar:"Partner Perf",tier:"starter",build:2,demo:"med",isNew:false,isLive:false,type:"skill",typeReason:"Structured data retrieval and formatting from SFDC. Consistent schema. No judgment.",deps:[{n:"Salesforce",s:"confirmed"}],why:"SFDC read query on a partner account. Format BOB, pipeline, customer count.",tip:"Ask 'show me Merkle's profile' and watch it assemble in real time.",conn:"Salesforce (read)",out:"Slack reply",note:"Jaimie and Chayter both do Merkle QBR prep manually."},
-  {rank:7,title:"Exec roll-up",pillar:"Intelligence",tier:"starter",build:2,demo:"high",isNew:false,isLive:false,type:"skill",typeReason:"Formatting and reshaping operation on output from other sub-agents. No new retrieval or judgment.",deps:[{n:"Salesforce",s:"confirmed"}],why:"Same SFDC query as bookings, reshaped by audience_level param.",tip:"Run same query twice: once as IC, once 'for Peter'. Show the format shift.",conn:"Salesforce (read)",out:"Structured doc",note:"Peter explicitly asked Courtney for an AI workflow to do this."},
-  {rank:8,title:"Cert tracker",pillar:"Partner Perf",tier:"starter",build:2,demo:"med",isNew:false,isLive:false,type:"skill",typeReason:"Reads cert data, applies expiry threshold rule, generates alert. Deterministic.",deps:[{n:"Salesforce",s:"confirmed"},{n:"Google Drive",s:"confirmed"}],why:"SFDC or Drive read for cert data. Kelly already tracks this in a spreadsheet.",tip:"Show a list of partners with expiring certs and the Slack alert it sends.",conn:"Salesforce / Drive (read)",out:"Slack alert",note:"Kelly explicitly said she wants an agent to report on certification completion."},
-  {rank:9,title:"Deal note capture",pillar:"Deal & Pipeline",tier:"medium",build:3,demo:"high",isNew:false,isLive:false,type:"skill",typeReason:"Slack trigger → parse note → write to SFDC field. Deterministic pipeline. No judgment.",deps:[{n:"Slack",s:"confirmed"},{n:"Salesforce (write)",s:"confirmed"}],why:"Slack trigger → SFDC write. One write-back scoped to a single field.",tip:"Type a deal update in Slack, show it appearing in SFDC 5 seconds later.",conn:"Slack (trigger) + Salesforce (write)",out:"SFDC record",note:"Highest demo-to-effort ratio in the medium tier."},
-  {rank:10,title:"Stale triage",pillar:"Deal & Pipeline",tier:"medium",build:3,demo:"high",isNew:false,isLive:true,type:"agent",typeReason:"Must identify stale deals, assess which warrant action vs closure, generate next-action recommendations. Judgment at each step.",deps:[{n:"Salesforce",s:"confirmed"},{n:"Slack",s:"confirmed"}],why:"SFDC read for S0/S1 report + Slack alert. Courtney sends this manually every Tuesday.",tip:"Show Courtney's Tuesday message alongside the agent's version with added recommendations.",conn:"Salesforce (read)",out:"Slack alert",note:"Courtney's 'Stale S0s Triage Tuesday' message is literally the template."},
-  {rank:11,title:"Bookings query",pillar:"Intelligence",tier:"medium",build:3,demo:"med",isNew:false,isLive:true,type:"skill",typeReason:"Deterministic data retrieval with time range logic. You ask for a number, it returns a number. No judgment.",deps:[{n:"Salesforce",s:"confirmed"},{n:"Amp on Amp",s:"confirmed"}],why:"SFDC read + time range logic. Ethem already does a version.",tip:"Ask 'AMER new bookings vs same quarter last year?' YoY comparison is the money shot.",conn:"Salesforce + Amp on Amp (read)",out:"Slack reply",note:"Ethem's Agent 1 does daily ARR email. This is the on-demand version."},
-  {rank:12,title:"Renewal cadence",pillar:"Partner Perf",tier:"medium",build:3,demo:"high",isNew:true,isLive:false,type:"agent",typeReason:"Must assess health data, infer churn cause, reason about intervention capability. Most judgment-intensive in its pillar.",deps:[{n:"Amp on Amp",s:"confirmed"},{n:"Salesforce",s:"confirmed"},{n:"Slack (signals)",s:"confirmed"}],why:"Amp-on-Amp (health scores) + SFDC (renewal dates). Both confirmed.",tip:"Show red-health account: 'branch out — EB departed'. Show bankrupt: 'predict churn, move on'.",conn:"Amp on Amp + Salesforce (read)",out:"Slack digest",note:"DC asked for 'account health check' in his AI Week thread."},
-  {rank:13,title:"Capabilities map",pillar:"Partner Perf",tier:"medium",build:3,demo:"med",isNew:false,isLive:false,type:"skill",typeReason:"Structured retrieval from SFDC and Drive, consistent format. Called by Best partner fit. No own judgment.",deps:[{n:"Salesforce",s:"confirmed"},{n:"Google Drive",s:"confirmed"}],why:"Drive + SFDC read. Complexity is joining company-level and individual-level capability data.",tip:"Ask 'who on the Converteo team is certified in experimentation?' Specific names drive the demo.",conn:"Salesforce + Google Drive (read)",out:"Slack reply",note:"Kelly's cert tracker spreadsheet is the seed data."},
-  {rank:14,title:"Co-sell health",pillar:"Co-sell Collab",tier:"medium",build:3,demo:"med",isNew:false,isLive:false,type:"agent",typeReason:"Must synthesize signals across systems, assess recency and quality, produce a prioritized health assessment.",deps:[{n:"Salesforce",s:"confirmed"},{n:"Slack",s:"confirmed"}],why:"SFDC + Slack read for engagement signals. Defining 'joint engagement' in the prompt is the complexity.",tip:"Show last Slack mention, SFDC activity, and partner last login as a recency snapshot.",conn:"Salesforce + Slack (read)",out:"Slack reply",note:""},
-  {rank:15,title:"Promos & credits",pillar:"Deal & Pipeline",tier:"medium",build:3,demo:"med",isNew:false,isLive:false,type:"skill",typeReason:"Eligibility lookup against a matrix. Rule-based — eligible or not, with reason cited.",deps:[{n:"Google Drive",s:"confirmed"},{n:"Salesforce",s:"confirmed"}],why:"Drive RAG on an eligibility matrix doc. Wrong answers in a demo kill trust.",tip:"Ask 'is this deal eligible for AWS credits?' Agent cites specific criteria.",conn:"Google Drive + Salesforce (read)",out:"Slack reply",note:"Kim flagged MPOPP vs WMP confusion repeatedly."},
-  {rank:16,title:"Best partner fit",pillar:"Partner Perf",tier:"medium",build:4,demo:"high",isNew:false,isLive:false,type:"agent",typeReason:"Has a goal (recommend the right partner), must reason across segment, use case, and relationship signals.",deps:[{n:"Crossbeam",s:"confirmed"},{n:"Salesforce",s:"confirmed"},{n:"Google Drive",s:"confirmed"}],why:"Crossbeam + SFDC + Drive RAG. Three connectors, all read-only.",tip:"Drop in a real prospect, watch the agent recommend a partner with reasoning.",conn:"Crossbeam + Salesforce + Drive (read)",out:"Slack reply",note:"Edwin asked for 'how to find new and best contributing partners'."},
-  {rank:17,title:"AE account match",pillar:"Partner Perf",tier:"medium",build:4,demo:"high",isNew:false,isLive:false,type:"agent",typeReason:"Goal-directed: identify accounts where partner relationships create opportunity. Reasons across TpARR and Crossbeam depth.",deps:[{n:"Salesforce",s:"confirmed"},{n:"Crossbeam",s:"confirmed"}],why:"SFDC + Crossbeam. Joining TpARR ranking with relationship depth.",tip:"Ask 'which of Tod's A+ accounts have partners with strong relationships?'",conn:"Salesforce + Crossbeam (read)",out:"Slack reply",note:"Edwin and Perri both thinking about account-partner matching."},
-  {rank:18,title:"Forecast roll-up",pillar:"Deal & Pipeline",tier:"harder",build:4,demo:"high",isNew:false,isLive:false,type:"agent",typeReason:"Applies a math model, then opens a PSM judgment override layer, then formats for audience. Three distinct reasoning steps.",deps:[{n:"Salesforce",s:"confirmed"}],why:"SFDC + math model (commit/strong upside/upside weighting) + PSM judgment override.",tip:"Raw SFDC data → weighted forecast → PSM override. Three steps, one screen.",conn:"Salesforce (read)",out:"Structured doc",note:"Peter's recommended build. Highest strategic value."},
-  {rank:19,title:"MDF & payments",pillar:"Cross-fn",tier:"harder",build:4,demo:"med",isNew:false,isLive:false,type:"agent",typeReason:"Handles a range of payment questions where the answer depends on partner type, direction, and status.",deps:[{n:"Salesforce",s:"confirmed"},{n:"Finance system",s:"uncertain"}],why:"SFDC + Finance system. Complexity is accessing MDF balance and request status.",tip:"Show a partner's MDF balance and open requests in one query.",conn:"Salesforce + Finance (read)",out:"Slack reply",note:""},
-  {rank:20,title:"Referral payments",pillar:"Cross-fn",tier:"harder",build:4,demo:"med",isNew:true,isLive:false,type:"skill",typeReason:"Status lookup against SFDC and Tipalti for a specific deal or partner. Deterministic once lookup is defined.",deps:[{n:"Salesforce",s:"confirmed"},{n:"Tipalti",s:"uncertain"}],why:"SFDC + Tipalti (uncertain). Falls back to SFDC closed deal amounts if Tipalti unavailable.",tip:"'What do we owe Twilio?' and 'What does Adswerve still owe us?' in the same query.",conn:"Salesforce + Tipalti (uncertain)",out:"Slack reply",note:"Ethem surfaced the exact five payment jobs in Slack."},
-  {rank:21,title:"Joint acct planning",pillar:"Co-sell Collab",tier:"harder",build:4,demo:"high",isNew:false,isLive:false,type:"agent",typeReason:"Must pull the right historical context and populate a template with judgment about what to emphasize.",deps:[{n:"Salesforce",s:"confirmed"},{n:"Google Drive",s:"confirmed"}],why:"SFDC read + template pre-fill. Complexity is pulling the right deal history.",tip:"Open a blank JAP template, run the agent, watch it populate. 30 seconds.",conn:"Salesforce (read) + Google Drive",out:"Document",note:"Mentioned in original context notes as a key AE workflow to automate."},
-  {rank:22,title:"Call notes ingestion",pillar:"Co-sell Collab",tier:"harder",build:5,demo:"high",isNew:false,isLive:false,type:"skill",typeReason:"Transcript → parse → extract structured fields → write to SFDC. Deterministic pipeline. No judgment.",deps:[{n:"Granola",s:"confirmed"},{n:"Zoom",s:"uncertain"},{n:"Salesforce (write)",s:"confirmed"}],why:"Granola MCP + SFDC write. Two connectors plus write-back.",tip:"Play 30 seconds of a Granola transcript, then show the structured SFDC record created.",conn:"Granola / Zoom + Salesforce (write)",out:"SFDC record",note:"Tim Hughes already wiring partner integrations."},
-  {rank:23,title:"Deal reg validation",pillar:"Co-sell Collab",tier:"harder",build:5,demo:"med",isNew:false,isLive:false,type:"agent",typeReason:"Applies MEDDPICC scoring, identifies gaps, makes routing decision (AE vs RSD vs Ops), drafts a specific ask. Multiple judgment steps.",deps:[{n:"Salesforce",s:"confirmed"},{n:"Routing logic",s:"confirmed"}],why:"SFDC read + MEDDPICC scoring + routing workflow. Three layers.",tip:"Submit a thin deal reg, watch it get scored, gaps flagged, routed to AE.",conn:"Salesforce (read) + routing logic",out:"Slack + SFDC",note:"Jaimie flagged retrodating and deal reg questions in weekly updates."},
-  {rank:24,title:"DR workflow & routing",pillar:"Co-sell Collab",tier:"harder",build:5,demo:"med",isNew:false,isLive:false,type:"skill",typeReason:"Executes routing once the validation decision is made above. Deterministic if the decision has been made.",deps:[{n:"Salesforce",s:"confirmed"},{n:"Slack (write)",s:"confirmed"}],why:"Depends on deal reg validation. Complexity is the conditional AE → RSD → Ops escalation tree.",tip:"Show a rejected DR and the auto-drafted escalation Slack message.",conn:"Salesforce (read) + Slack (write)",out:"Slack routing message",note:"Best built as Phase 2 extension of deal reg validation."},
+  {rank:1, title:"Business problem narrative",
+   branch:"xfn", tier:"starter", build:1, isNew:false, isLive:false,
+   type:"agent",
+   typeReason:"Has a goal (frame a compelling client narrative), makes editorial decisions, produces shaped output. Judgment at every section.",
+   desc:"Turns a client name, industry, and challenge into a structured consultant-grade narrative — problem framing, why it's hard, reference story, transformation path, and Amplitude's role — ready for a partner to use in a client meeting.",
+   deps:[{n:"Google Drive",s:"confirmed"},{n:"Internal KB docs",s:"confirmed"}],
+   skillDeps:[],
+   why:"Pure prompt + Drive RAG. Zero connectors needed. Write a system prompt, point at a doc folder, done in under an hour.",
+   conn:"Google Drive (read only)", out:"Slack reply",
+   note:"No Slack signal of anyone building this yet — wide open. Perfect for Kelly or Nick."},
+
+  {rank:2, title:"Pricing + narrative",
+   branch:"xfn", tier:"starter", build:1, isNew:false, isLive:false,
+   type:"agent",
+   typeReason:"Must assess deal context, retrieve the right pricing tier, and construct a framing narrative. The narrative component requires judgment.",
+   desc:"Generates a deal-stage-appropriate pricing estimate with a built-in framing narrative — explains the commercial value before showing the number, and declines to produce a price until sufficient deal context is provided.",
+   deps:[{n:"Google Drive",s:"confirmed"},{n:"Pricing doc",s:"confirmed"}],
+   skillDeps:[],
+   why:"Drive RAG + a pricing doc. No connector beyond Drive.",
+   conn:"Google Drive (read only)", out:"Slack reply",
+   note:"Jaimie, DC, Marilisa all flagged pricing calculator gaps in weekly updates."},
+
+  {rank:3, title:"Weekly update drafter",
+   branch:"daily", tier:"starter", build:1, isNew:false, isLive:false,
+   type:"agent",
+   typeReason:"Synthesizes from multiple sources, makes editorial decisions about what to include, formats for a specific audience. Judgment required.",
+   desc:"Pre-populates the team's standard weekly check-in format from SFDC pipeline data — wins, deliverables, and help-needed — so a PSM can review and send rather than draft from scratch every Sunday.",
+   deps:[{n:"Salesforce",s:"confirmed"}],
+   skillDeps:[],
+   why:"SFDC read (one report query), format into the team's existing check-in template.",
+   conn:"Salesforce (read)", out:"Slack / doc",
+   note:"Elli already runs a personal version via Cowork. This standardizes it for the whole team."},
+
+  {rank:4, title:"Morning digest",
+   branch:"daily", tier:"starter", build:2, isNew:false, isLive:true,
+   type:"agent",
+   typeReason:"Has a goal (surface what needs attention today), makes prioritization decisions, pulls from multiple sources, produces a shaped narrative.",
+   desc:"Delivers a daily 8am briefing covering deal changes, Slack mentions, calendar prep, and flagged action items — surfacing only what actually needs attention so the PSM starts the day focused, not overwhelmed.",
+   deps:[{n:"Slack",s:"confirmed"},{n:"Google Calendar",s:"confirmed"},{n:"Salesforce",s:"confirmed"}],
+   skillDeps:[],
+   why:"Slack + GCal reads only. Ethem has 4 live variants. Most proven pattern on the team.",
+   conn:"Slack + GCal + Salesforce (read)", out:"Slack reply",
+   note:"Ethem's Agents 3 and 4 are doing this now."},
+
+  {rank:5, title:"MQL flag (read-only)",
+   branch:"xfn", tier:"starter", build:2, isNew:true, isLive:false,
+   type:"skill",
+   typeReason:"Domain filter applied to a list. Rule-based, deterministic, read-only. No judgment.",
+   desc:"Reads the MQL list from SFDC, applies a blocklist of generic email domains (gmail, naver, yahoo, hotmail, etc.), and surfaces a filtered list to the PSM with a count and recommended bulk-rejection action — since SFDC is read-only, the PSM actions it manually.",
+   deps:[{n:"Salesforce",s:"confirmed"}],
+   skillDeps:[],
+   why:"SFDC read + a domain blocklist in the prompt. Pure filter logic.",
+   conn:"Salesforce (read only)", out:"Slack list to PSM",
+   note:"DC flagged this. SFDC write ceiling is confirmed — document it explicitly."},
+
+  {rank:6, title:"Partner profile",
+   branch:"perf", tier:"starter", build:2, isNew:false, isLive:false,
+   type:"skill",
+   typeReason:"Structured data retrieval and formatting from SFDC. Returns a consistent schema every time. No judgment — called by other sub-agents.",
+   desc:"Returns a structured one-page snapshot of a partner company: pipeline contribution, book of business, customer count, active projects by segment and region, and PSM owner — callable directly or as a component of higher-level agents.",
+   deps:[{n:"Salesforce",s:"confirmed"}],
+   skillDeps:[],
+   why:"SFDC read query on a partner account. Format BOB, pipeline, customer count.",
+   conn:"Salesforce (read)", out:"Slack reply",
+   note:"Jaimie and Chayter both do Merkle QBR prep manually. Direct time-save."},
+
+  {rank:7, title:"Exec roll-up",
+   branch:"daily", tier:"starter", build:2, isNew:false, isLive:false,
+   type:"skill",
+   typeReason:"A formatting and reshaping operation on output from other sub-agents. No new retrieval or judgment — transforms existing output by audience level.",
+   desc:"Takes any standard PSM Agent output and reshapes it for exec consumption: strips operational detail, leads with the headline metric, adds regional summary and top 3 flags. Invoked by appending 'for exec' or 'for Peter' to any query.",
+   deps:[{n:"Salesforce",s:"confirmed"}],
+   skillDeps:[],
+   why:"Same SFDC query as bookings, reshaped by audience_level param.",
+   conn:"Salesforce (read)", out:"Structured doc",
+   note:"Peter explicitly asked Courtney for an AI workflow to do this."},
+
+  {rank:8, title:"Cert tracker",
+   branch:"perf", tier:"starter", build:2, isNew:false, isLive:false,
+   type:"skill",
+   typeReason:"Reads cert data, applies an expiry threshold rule, generates an alert. Deterministic — no judgment, just whether the threshold is triggered.",
+   desc:"Monitors partner certification data for expiring or missing certs against the target (5 sales + 2 delivery per reseller), generates Slack alerts to the PSM owner with the specific partners and individuals at risk.",
+   deps:[{n:"Salesforce",s:"confirmed"},{n:"Google Drive",s:"confirmed"}],
+   skillDeps:[],
+   why:"SFDC or Drive read for cert data. Kelly already tracks this in a spreadsheet.",
+   conn:"Salesforce / Drive (read)", out:"Slack alert",
+   note:"Kelly explicitly said she wants an agent to report on certification completion."},
+
+  {rank:9, title:"Deal note capture",
+   branch:"deal", tier:"medium", build:3, isNew:false, isLive:false,
+   type:"skill",
+   typeReason:"Slack trigger → parse note → write to SFDC field. Deterministic pipeline. No judgment.",
+   desc:"Listens for deal update messages in Slack (triggered by a keyword or mention), parses the note, and writes it to the correct SFDC opportunity activity record — eliminating the manual login-and-type workflow after every partner call.",
+   deps:[{n:"Slack",s:"confirmed"},{n:"Salesforce (write)",s:"confirmed"}],
+   skillDeps:[],
+   why:"Slack trigger → SFDC write. One write-back scoped to a single field.",
+   conn:"Slack (trigger) + Salesforce (write)", out:"SFDC record",
+   note:"Highest demo-to-effort ratio in the medium tier."},
+
+  {rank:10, title:"Stale triage",
+   branch:"deal", tier:"medium", build:3, isNew:false, isLive:true,
+   type:"agent",
+   typeReason:"Must identify which deals are stale, assess which warrant action vs. closure, and generate specific next-action recommendations. Judgment at each step.",
+   desc:"Runs every Tuesday against the S0/S1 pipeline, identifies opportunities with no activity in the past 14 days, assesses each one (action, close-out, or flag to AE), and posts a triage message to Slack with specific named recommendations — replacing Courtney's manual weekly message.",
+   deps:[{n:"Salesforce",s:"confirmed"},{n:"Slack",s:"confirmed"}],
+   skillDeps:[],
+   why:"SFDC read for S0/S1 report + Slack alert. Courtney sends this manually every Tuesday.",
+   conn:"Salesforce (read)", out:"Slack alert",
+   note:"Courtney's 'Stale S0s Triage Tuesday' message is literally the template."},
+
+  {rank:11, title:"Bookings query",
+   branch:"daily", tier:"medium", build:3, isNew:false, isLive:true,
+   type:"skill",
+   typeReason:"Deterministic data retrieval with time range logic. You ask for a number, it returns a number. Called by other sub-agents or directly. No judgment.",
+   desc:"Answers natural-language booking and pipeline questions — new ARR, renewals, pipeline by stage — across any time range (YTD, QTD, monthly, weekly, YoY, or custom). Returns structured data callable by the morning digest and exec roll-up.",
+   deps:[{n:"Salesforce",s:"confirmed"},{n:"Amp on Amp",s:"confirmed"}],
+   skillDeps:[],
+   why:"SFDC read + time range logic. Complexity is in the time range engine.",
+   conn:"Salesforce + Amp on Amp (read)", out:"Slack reply",
+   note:"Ethem's Agent 1 does daily ARR email. This is the on-demand query version."},
+
+  {rank:12, title:"Renewal cadence",
+   branch:"perf", tier:"medium", build:3, isNew:true, isLive:false,
+   type:"agent",
+   typeReason:"Must assess health data, infer churn cause, reason about intervention capability, and produce a prioritized recommendation. Most judgment-intensive item in its pillar.",
+   desc:"Produces a weekly digest of joint accounts (co-sold or resold) with red/yellow health scores, prioritized by account size and intervention urgency. Reasons about the type of intervention worth making — distinguishing between 'EB departed, branch out' vs. 'filed for bankruptcy, predict churn and move on.'",
+   deps:[{n:"Amp on Amp",s:"confirmed"},{n:"Salesforce",s:"confirmed"}],
+   skillDeps:[],
+   why:"Amp-on-Amp (health scores) + SFDC (renewal dates). Complexity is the intervention logic.",
+   conn:"Amp on Amp + Salesforce (read)", out:"Slack digest",
+   note:"DC asked for 'account health check' in his AI Week thread."},
+
+  {rank:13, title:"Capabilities map",
+   branch:"perf", tier:"medium", build:3, isNew:false, isLive:false,
+   type:"skill",
+   typeReason:"Structured retrieval from SFDC and Drive, returned in a consistent format. Called by Best partner fit and AE account match. No judgment of its own.",
+   desc:"Returns a structured capability profile for a partner company and its individual ICs: Amplitude product certifications by area, use case delivery history, industry depth, add-on product experience (Experimentation, Session Replay, CDP integrations), and current delivery capacity signal.",
+   deps:[{n:"Salesforce",s:"confirmed"},{n:"Google Drive",s:"confirmed"}],
+   skillDeps:[],
+   why:"Drive + SFDC read. Complexity is joining company-level and individual-level capability data.",
+   conn:"Salesforce + Google Drive (read)", out:"Slack reply",
+   note:"Kelly is building this skill this week. Coordinate before building Best partner fit."},
+
+  {rank:14, title:"Co-sell health",
+   branch:"cosell", tier:"medium", build:3, isNew:false, isLive:false,
+   type:"agent",
+   typeReason:"Must synthesize signals across systems, assess recency and quality, and produce a prioritized health assessment. Judgment required.",
+   desc:"Surfaces a joint engagement snapshot for any co-sell deal: last Slack mention of the partner, last SFDC activity, partner portal last login, and open action items — giving the PSM a single recency view before a co-sell check-in call.",
+   deps:[{n:"Salesforce",s:"confirmed"},{n:"Slack",s:"confirmed"}],
+   skillDeps:[],
+   why:"SFDC + Slack read for engagement signals. Defining 'joint engagement' is the complexity.",
+   conn:"Salesforce + Slack (read)", out:"Slack reply",
+   note:""},
+
+  {rank:15, title:"Promos & credits",
+   branch:"deal", tier:"medium", build:3, isNew:false, isLive:false,
+   type:"skill",
+   typeReason:"Eligibility lookup against a matrix. Rule-based — either eligible or not, with the reason cited. No judgment beyond applying the rule.",
+   desc:"Checks whether a given deal is eligible for AWS credits, GCP credits, MPOPP, or other promotional vehicles by querying the eligibility matrix, returns the result with the specific criteria cited — resolving the MPOPP vs. WMP confusion the team hits repeatedly.",
+   deps:[{n:"Google Drive",s:"confirmed"},{n:"Salesforce",s:"confirmed"}],
+   skillDeps:[],
+   why:"Drive RAG on an eligibility matrix doc. Wrong answers in a demo kill trust.",
+   conn:"Google Drive + Salesforce (read)", out:"Slack reply",
+   note:"Kim flagged MPOPP vs WMP confusion repeatedly."},
+
+  {rank:16, title:"Best partner fit",
+   branch:"perf", tier:"medium", build:4, isNew:false, isLive:false,
+   type:"agent",
+   typeReason:"Has a goal (recommend the right partner for a given account), must reason across segment, use case, relationship signals, and delivery capacity. Judgment required.",
+   desc:"Given an account name, industry, and deal scenario, recommends which partner(s) to bring in and why — reasoning across Crossbeam overlap, capabilities map depth, tech stack familiarity, and delivery capacity. Distinguishes between a door-opener partner and a delivery partner when they're different.",
+   deps:[{n:"Crossbeam",s:"confirmed"},{n:"Salesforce",s:"confirmed"},{n:"Google Drive",s:"confirmed"}],
+   skillDeps:[13],
+   why:"Crossbeam + SFDC + Drive RAG. Complexity is the matching logic across multiple dimensions.",
+   conn:"Crossbeam + Salesforce + Drive (read)", out:"Slack reply",
+   note:"Requires Capabilities map skill (rank 13) to be built first."},
+
+  {rank:17, title:"AE account match",
+   branch:"perf", tier:"medium", build:4, isNew:false, isLive:false,
+   type:"agent",
+   typeReason:"Goal-directed: identify accounts where partner relationships create the strongest opportunity. Reasons across TpARR priority and Crossbeam relationship depth.",
+   desc:"Scans an AE's top TpARR accounts and A+ prospects against Crossbeam data to surface which ones have a partner with a strong existing relationship — giving AEs a prioritized short list of accounts where a partner intro is most likely to accelerate the deal.",
+   deps:[{n:"Salesforce",s:"confirmed"},{n:"Crossbeam",s:"confirmed"}],
+   skillDeps:[13],
+   why:"SFDC + Crossbeam. Joining TpARR ranking with relationship depth.",
+   conn:"Salesforce + Crossbeam (read)", out:"Slack reply",
+   note:"Edwin and Perri both thinking about account-partner matching."},
+
+  {rank:18, title:"Forecast roll-up",
+   branch:"deal", tier:"harder", build:4, isNew:false, isLive:false,
+   type:"agent",
+   typeReason:"Applies a math model, then opens a PSM judgment override layer, then formats for audience. Three distinct reasoning steps.",
+   desc:"Generates a weekly partner-sourced forecast by pulling SFDC pipeline, applying category weighting (commit = 90%, strong upside = 60%, upside = 30%), and presenting the mathematical result alongside a PSM override prompt — so the PSM can adjust based on qualitative context the data doesn't capture.",
+   deps:[{n:"Salesforce",s:"confirmed"}],
+   skillDeps:[],
+   why:"SFDC + math model + PSM judgment override. Three moving parts.",
+   conn:"Salesforce (read)", out:"Structured doc",
+   note:"Peter's recommended build. Elli already does a manual version in a spreadsheet."},
+
+  {rank:19, title:"MDF & payments",
+   branch:"xfn", tier:"harder", build:4, isNew:false, isLive:false,
+   type:"agent",
+   typeReason:"Handles a range of payment questions where the right answer depends on partner type, direction, and status. Context-dependent.",
+   desc:"Answers questions about MDF balances, open requests, partner reimbursement status, and payment workflows — bidirectionally: what Amplitude owes partners and what resellers owe Amplitude — pulling from SFDC and the Finance system.",
+   deps:[{n:"Salesforce",s:"confirmed"},{n:"Finance system",s:"uncertain"}],
+   skillDeps:[],
+   why:"SFDC + Finance system. Finance system access may need Ops involvement.",
+   conn:"Salesforce + Finance (read)", out:"Slack reply",
+   note:""},
+
+  {rank:20, title:"Referral payments",
+   branch:"xfn", tier:"harder", build:4, isNew:true, isLive:false,
+   type:"skill",
+   typeReason:"Status lookup against SFDC and Tipalti for a specific deal or partner. Deterministic once the lookup is defined.",
+   desc:"Returns the current payment status for a specific referral deal or partner — outbound (fees Amplitude owes a referring partner) and inbound (outstanding amounts resellers owe Amplitude) — surfacing amount, days outstanding, and next action in a single query.",
+   deps:[{n:"Salesforce",s:"confirmed"},{n:"Tipalti",s:"uncertain"}],
+   skillDeps:[],
+   why:"SFDC + Tipalti (uncertain). Falls back to SFDC closed deal amounts if Tipalti unavailable.",
+   conn:"Salesforce + Tipalti (uncertain)", out:"Slack reply",
+   note:"Ethem surfaced the exact five payment jobs in Slack."},
+
+  {rank:21, title:"Joint acct planning",
+   branch:"cosell", tier:"harder", build:4, isNew:false, isLive:false,
+   type:"agent",
+   typeReason:"Must pull the right historical context, assess relevance for this specific account, and populate a template with judgment about what to emphasize.",
+   desc:"Pre-populates the joint account planning template for a given deal — pulling relevant SFDC deal history, existing contacts, prior partner activity, and account context — so the PSM and partner arrive at the planning session with substance rather than blank fields.",
+   deps:[{n:"Salesforce",s:"confirmed"},{n:"Google Drive",s:"confirmed"}],
+   skillDeps:[],
+   why:"SFDC read + template pre-fill. Complexity is pulling the right deal history.",
+   conn:"Salesforce (read) + Google Drive", out:"Document",
+   note:"Mentioned in original context notes as a key AE workflow to automate."},
+
+  {rank:22, title:"Call notes ingestion",
+   branch:"cosell", tier:"harder", build:5, isNew:false, isLive:false,
+   type:"skill",
+   typeReason:"Transcript → parse → extract structured fields → write to SFDC. Deterministic pipeline. No judgment.",
+   desc:"Ingests a meeting transcript from Granola or Zoom, extracts structured fields (attendees, key decisions, action items, next steps, partner commitments), and writes a clean activity record to SFDC — eliminating manual note-taking and CRM update after every partner call.",
+   deps:[{n:"Granola",s:"confirmed"},{n:"Zoom",s:"uncertain"},{n:"Salesforce (write)",s:"confirmed"}],
+   skillDeps:[],
+   why:"Granola MCP + SFDC write. Two connectors plus write-back.",
+   conn:"Granola / Zoom + Salesforce (write)", out:"SFDC record",
+   note:"Tim Hughes already wiring partner integrations into demo environments."},
+
+  {rank:23, title:"Deal reg validation",
+   branch:"cosell", tier:"harder", build:5, isNew:false, isLive:false,
+   type:"agent",
+   typeReason:"Applies MEDDPICC scoring, identifies gaps, makes a routing decision (AE vs. RSD vs. Ops), and drafts a specific ask. Multiple judgment steps.",
+   desc:"Reviews a submitted deal registration against the 3 Whys framework and MEDDPICC criteria (S0–S2), scores the qualification completeness, flags specific gaps, and routes to the right person — AE for most gaps, RSD for escalations, Ops for edge cases — with a drafted ask attached.",
+   deps:[{n:"Salesforce",s:"confirmed"},{n:"Routing logic",s:"confirmed"}],
+   skillDeps:[],
+   why:"SFDC read + MEDDPICC scoring + routing workflow. Three layers of logic.",
+   conn:"Salesforce (read) + routing logic", out:"Slack + SFDC",
+   note:"Jaimie flagged retrodating and deal reg questions in weekly updates."},
+
+  {rank:24, title:"DR workflow & routing",
+   branch:"cosell", tier:"harder", build:5, isNew:false, isLive:false,
+   type:"skill",
+   typeReason:"Executes the routing once the validation decision is made by the agent above. Deterministic if the decision has already been made.",
+   desc:"Executes the deal registration routing workflow: sends the right message to the right person (AE, RSD, or Ops) with the deal reg context attached, using the routing decision made by the Deal reg validation agent. Depends on that agent being built first.",
+   deps:[{n:"Salesforce",s:"confirmed"},{n:"Slack (write)",s:"confirmed"}],
+   skillDeps:[23],
+   why:"Depends on deal reg validation. Complexity is the AE → RSD → Ops escalation tree.",
+   conn:"Salesforce (read) + Slack (write)", out:"Slack routing message",
+   note:"Best built as Phase 2 extension of deal reg validation."},
 ];
 
-// ── CONSTANTS ─────────────────────────────────────────────────────────
-const TIER_LABELS = {starter:"Tier 1 — Starter  (build in a day)",medium:"Tier 2 — Medium  (2–3 days)",harder:"Tier 3 — Harder  (3–5 days or post-AI Week)"};
+// ── CONSTANTS ──────────────────────────────────────────────────────────
+const TIER_LABELS = {
+  starter:"Tier 1 — Starter  (build in a day)",
+  medium: "Tier 2 — Medium  (2–3 days)",
+  harder: "Tier 3 — Harder  (3–5 days or post-AI Week)"
+};
 const BUILD_LABEL = ["","Very easy","Easy","Medium","Hard","Complex"];
 const BUILD_CLS   = ["","p-b1","p-b2","p-b3","p-b4","p-b5"];
 const BUILD_COLOR = ["","#3B6D11","#0F6E56","#854F0B","#993C1D","#791F1F"];
-const DEMO_CLS    = {high:"p-dh",med:"p-dm",low:"p-dl"};
 
-// ── STATE ─────────────────────────────────────────────────────────────
+const BRANCHES = {
+  daily:  {label:"Daily Prioritization",       hdr:"br-hdr-daily",  pill:"p-br-daily"},
+  perf:   {label:"Partner Performance",         hdr:"br-hdr-perf",   pill:"p-br-perf"},
+  deal:   {label:"Deal & Pipeline Mgmt",        hdr:"br-hdr-deal",   pill:"p-br-deal"},
+  cosell: {label:"Co-sell Collab Tools",        hdr:"br-hdr-cosell", pill:"p-br-cosell"},
+  xfn:    {label:"Cross-Functional Requests",   hdr:"br-hdr-xfn",    pill:"p-br-xfn"},
+};
+
+const BRANCH_BTN_CLS = {
+  daily:"br-daily", perf:"br-perf", deal:"br-deal", cosell:"br-cosell", xfn:"br-xfn"
+};
+
+// ── STATE ──────────────────────────────────────────────────────────────
 let activeFilter = "all";
 let expandedRank = null;
-let claimed = {}; // { rank: ownerName }
-let cfg = {};     // { name, supabaseUrl, supabaseKey }
+let currentView  = "list";
+const claimed    = {};
 
-// ── CONFIG (localStorage) ─────────────────────────────────────────────
-const SUPABASE_URL = "https://swpmtbpmnrajdxuewsxw.supabase.co";
-const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN3cG10YnBtbnJhamR4dWV3c3h3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYxMjE1NzgsImV4cCI6MjA5MTY5NzU3OH0.vxdACrOG4wX5jBXeynmaccOc9Tdtd2OOIIl25jwnvPE";
-
-function loadConfig() {
-  try {
-    const stored = JSON.parse(localStorage.getItem("psm_cfg_sb") || "{}");
-    cfg = {
-      name: stored.name || "",
-      supabaseUrl: SUPABASE_URL,
-      supabaseKey: SUPABASE_KEY
-    };
-  } catch(e) {
-    cfg = { name: "", supabaseUrl: SUPABASE_URL, supabaseKey: SUPABASE_KEY };
-  }
+// ── CLAIM ──────────────────────────────────────────────────────────────
+function getClaimName() { return document.getElementById("claimName").value.trim(); }
+function updateClaimHint() {
+  const n = getClaimName();
+  document.getElementById("claimHint").textContent = n
+    ? `Checking a box will claim that item for ${n}`
+    : "Enter your name, then check a box to claim an item";
 }
-
-function saveConfig() {
-  const name = document.getElementById("setupName").value.trim();
-  if (!name) { setSetupStatus("Enter your name to continue", false); return; }
-  cfg.name = name;
-  localStorage.setItem("psm_cfg_sb", JSON.stringify({ name }));
-  document.getElementById("setupPanel").classList.add("hidden");
-  document.getElementById("claimRow").style.display = "flex";
-  document.getElementById("claimNameDisplay").textContent = cfg.name;
-  loadClaimsFromSupabase();
-}
-
-function clearConfig() {
-  localStorage.removeItem("psm_cfg_sb");
-  localStorage.removeItem("psm_claims_cache_sb");
-  cfg = { supabaseUrl: SUPABASE_URL, supabaseKey: SUPABASE_KEY, name: "" };
-  claimed = {};
-  document.getElementById("setupPanel").classList.remove("hidden");
-  document.getElementById("claimRow").style.display = "none";
-  document.getElementById("setupName").value = "";
-  setSyncStatus("Not connected", "");
-  updateSummary(); render();
-}
-
-function showSetup() {
-  document.getElementById("setupPanel").classList.remove("hidden");
-  if (cfg.name) document.getElementById("setupName").value = cfg.name;
-}
-
-function setSetupStatus(msg, ok) {
-  const el = document.getElementById("setupStatus");
-  el.textContent = msg;
-  el.className = "setup-status" + (ok === true ? " ok" : ok === false ? " err" : "");
-}
-
-// ── SUPABASE REST HELPERS ──────────────────────────────────────────────
-function sbHeaders() {
-  return {
-    "apikey": cfg.supabaseKey,
-    "Authorization": `Bearer ${cfg.supabaseKey}`,
-    "Content-Type": "application/json",
-    "Prefer": "return=minimal"
-  };
-}
-
-async function loadClaimsFromSupabase() {
-  if (!cfg.supabaseUrl || !cfg.supabaseKey) return;
-  setSyncStatus("Loading…", "loading");
-  try {
-    const res = await fetch(`${cfg.supabaseUrl}/rest/v1/claims?select=rank,owner`, {
-      headers: { "apikey": cfg.supabaseKey, "Authorization": `Bearer ${cfg.supabaseKey}` }
-    });
-    if (!res.ok) throw new Error(`Supabase ${res.status}`);
-    const rows = await res.json();
-    claimed = {};
-    rows.forEach(r => { claimed[r.rank] = r.owner; });
-    localStorage.setItem("psm_claims_cache_sb", JSON.stringify(claimed));
-    setSyncStatus("Synced " + new Date().toLocaleTimeString(), "ok");
-    setSetupStatus("Connected", true);
-    updateSummary(); render();
-  } catch(e) {
-    const cache = localStorage.getItem("psm_claims_cache_sb");
-    if (cache) { try { claimed = JSON.parse(cache); } catch(x) {} }
-    setSyncStatus("Offline — using cache", "err");
-    setSetupStatus("Connection error: " + e.message, false);
-    updateSummary(); render();
-  }
-}
-
-async function claimInSupabase(rank, owner) {
-  // Upsert: insert or update
-  const res = await fetch(`${cfg.supabaseUrl}/rest/v1/claims`, {
-    method: "POST",
-    headers: { ...sbHeaders(), "Prefer": "resolution=merge-duplicates,return=minimal" },
-    body: JSON.stringify({ rank, owner })
-  });
-  if (!res.ok) { const t = await res.text(); throw new Error(t); }
-}
-
-async function unclaimInSupabase(rank) {
-  const res = await fetch(`${cfg.supabaseUrl}/rest/v1/claims?rank=eq.${rank}`, {
-    method: "DELETE",
-    headers: sbHeaders()
-  });
-  if (!res.ok) { const t = await res.text(); throw new Error(t); }
-}
-
-// ── CLAIM HANDLER ─────────────────────────────────────────────────────
-async function handleClaim(rank, checked, e) {
+function handleClaim(rank, checked, e) {
   e.stopPropagation();
-  if (!cfg.name) {
-    alert("Complete the one-time setup first (click ⚙ Config).");
-    e.target.checked = !checked;
-    return;
-  }
-  if (checked) {
-    if (claimed[rank] && claimed[rank] !== cfg.name) {
-      alert(`Already claimed by ${claimed[rank]}.`);
-      e.target.checked = false;
-      return;
-    }
-    claimed[rank] = cfg.name;
-  } else {
-    if (claimed[rank] && claimed[rank] !== cfg.name) {
-      alert(`This item is claimed by ${claimed[rank]}. Only they can unclaim it.`);
-      e.target.checked = true;
-      return;
-    }
-    delete claimed[rank];
-  }
-  updateSummary(); render();
-  setSyncStatus("Saving…", "loading");
-  try {
-    if (checked) { await claimInSupabase(rank, cfg.name); }
-    else         { await unclaimInSupabase(rank); }
-    localStorage.setItem("psm_claims_cache_sb", JSON.stringify(claimed));
-    setSyncStatus("Saved " + new Date().toLocaleTimeString(), "ok");
-  } catch(err) {
-    setSyncStatus("Save failed: " + err.message, "err");
-  }
+  const name = getClaimName();
+  if (checked && !name) { alert("Enter your name above before claiming."); e.target.checked = false; return; }
+  if (checked) { claimed[rank] = name; } else { delete claimed[rank]; }
+  updateSummary();
+  currentView === "list" ? renderList() : renderTree();
 }
 
-// ── SUMMARY ───────────────────────────────────────────────────────────
+// ── SUMMARY ────────────────────────────────────────────────────────────
 function updateSummary() {
-  const total = A.length;
   const cc = Object.keys(claimed).length;
-  document.getElementById("s-total").textContent   = total;
+  document.getElementById("s-total").textContent   = A.length;
   document.getElementById("s-claimed").textContent = cc;
-  document.getElementById("s-open").textContent    = total - cc;
-  document.getElementById("s-agent").textContent   = A.filter(a => a.type === "agent").length;
-  document.getElementById("s-skill").textContent   = A.filter(a => a.type === "skill").length;
+  document.getElementById("s-open").textContent    = A.length - cc;
+  document.getElementById("s-agent").textContent   = A.filter(a => a.type==="agent").length;
+  document.getElementById("s-skill").textContent   = A.filter(a => a.type==="skill").length;
 }
 
-function setSyncStatus(msg, state) {
-  document.getElementById("syncMsg").textContent = msg;
-  const dot = document.getElementById("syncDot");
-  dot.className = "sync-dot" + (state ? " " + state : "");
+// ── VIEW TOGGLE ─────────────────────────────────────────────────────────
+function setView(v) {
+  currentView = v;
+  document.getElementById("btnList").classList.toggle("active", v==="list");
+  document.getElementById("btnTree").classList.toggle("active", v==="tree");
+  document.getElementById("listFilters").style.display = v==="list" ? "block" : "none";
+  document.getElementById("listView").style.display    = v==="list" ? "block" : "none";
+  document.getElementById("treeView").style.display    = v==="tree" ? "block" : "none";
+  if (v==="tree") renderTree(); else renderList();
 }
 
-// ── FILTER + TOGGLE ───────────────────────────────────────────────────
+// ── FILTER (list view) ─────────────────────────────────────────────────
 function setFilter(f, btn) {
   activeFilter = f;
   document.querySelectorAll(".fbtn").forEach(b => b.classList.remove("active","active-open","active-claimed"));
-  if      (f === "open")    btn.classList.add("active-open");
-  else if (f === "claimed") btn.classList.add("active-claimed");
-  else                      btn.classList.add("active");
-  render();
+  if      (f==="open")    btn.classList.add("active-open");
+  else if (f==="claimed") btn.classList.add("active-claimed");
+  else                    btn.classList.add("active");
+  renderList();
 }
-
-function toggle(rank) {
-  expandedRank = expandedRank === rank ? null : rank;
-  render();
-}
+function toggle(rank) { expandedRank = expandedRank===rank ? null : rank; renderList(); }
 
 function visible(a) {
-  if (activeFilter === "all")       return true;
-  if (activeFilter === "starter")   return a.tier === "starter";
-  if (activeFilter === "medium")    return a.tier === "medium";
-  if (activeFilter === "harder")    return a.tier === "harder";
-  if (activeFilter === "high-demo") return a.demo === "high";
-  if (activeFilter === "new")       return a.isNew;
-  if (activeFilter === "live")      return a.isLive;
-  if (activeFilter === "agent")     return a.type === "agent";
-  if (activeFilter === "skill")     return a.type === "skill";
-  if (activeFilter === "open")      return !claimed[a.rank];
-  if (activeFilter === "claimed")   return !!claimed[a.rank];
+  if (activeFilter==="all")       return true;
+  if (activeFilter==="starter")   return a.tier==="starter";
+  if (activeFilter==="medium")    return a.tier==="medium";
+  if (activeFilter==="harder")    return a.tier==="harder";
+  if (activeFilter==="new")       return a.isNew;
+  if (activeFilter==="live")      return a.isLive;
+  if (activeFilter==="agent")     return a.type==="agent";
+  if (activeFilter==="skill")     return a.type==="skill";
+  if (activeFilter==="open")      return !claimed[a.rank];
+  if (activeFilter==="claimed")   return !!claimed[a.rank];
+  if (activeFilter.startsWith("br-")) return a.branch === activeFilter.slice(3);
   return true;
 }
 
-// ── RENDER ────────────────────────────────────────────────────────────
+// ── HELPERS ────────────────────────────────────────────────────────────
 function depChip(dep) {
-  const cls  = dep.s === "confirmed" ? "dep-confirmed" : dep.s === "uncertain" ? "dep-uncertain" : "dep-none";
-  const icon = dep.s === "confirmed" ? "✓ " : dep.s === "uncertain" ? "? " : "";
+  const cls  = dep.s==="confirmed" ? "dep-confirmed" : dep.s==="uncertain" ? "dep-uncertain" : "dep-none";
+  const icon = dep.s==="confirmed" ? "✓ " : dep.s==="uncertain" ? "? " : "";
   return `<span class="dep-chip ${cls}">${icon}${dep.n}</span>`;
 }
-
-function card(a) {
-  const exp       = expandedRank === a.rank;
-  const vis       = visible(a);
-  const isClaimed = !!claimed[a.rank];
-  const owner     = claimed[a.rank] || "";
-  const isMe      = owner === cfg.name;
-  const demoW     = a.demo === "high" ? 48 : a.demo === "med" ? 29 : 10;
-  const buildW    = Math.round((a.build / 5) * 48);
-  const typePill  = a.type === "agent" ? `<span class="pill p-agent">Sub-agent</span>` : `<span class="pill p-skill">Skill</span>`;
-  const cbDisabled = (isClaimed && !isMe) ? "disabled" : "";
-  const cbTitle   = isClaimed ? (isMe ? "Uncheck to release claim" : `Claimed by ${owner}`) : "Claim this item for AI Week";
-
-  return `<div class="card${exp?" expanded":""}${isClaimed?" claimed":""}${!vis?" hidden":""}">
-  <div class="cb-col">
+function skillDepChip(rank) {
+  const a = A.find(x => x.rank===rank);
+  if (!a) return "";
+  const built = !!claimed[rank];
+  return `<span class="dep-chip dep-skill" onclick="event.stopPropagation();jumpTo(${rank})" title="Jump to: ${a.title}">${built?"✓ ":"⚠ "}${a.title}</span>`;
+}
+function jumpTo(rank) {
+  setView("list");
+  expandedRank = rank;
+  setFilter("all", document.querySelector(".fbtn.active") || document.querySelector(".fbtn"));
+  setTimeout(() => {
+    const el = document.querySelector(`[data-rank="${rank}"]`);
+    if (el) el.scrollIntoView({behavior:"smooth", block:"center"});
+  }, 80);
+}
+function cbHtml(rank) {
+  const isClaimed = !!claimed[rank];
+  const owner = claimed[rank] || "";
+  return `<div class="cb-col">
     <div class="cb-wrap">
-      <input type="checkbox" ${isClaimed?"checked":""} ${cbDisabled} onchange="handleClaim(${a.rank},this.checked,event)" title="${cbTitle}">
-      <div class="cb-box">
-        <svg class="cb-check" viewBox="0 0 10 10" fill="none"><path d="M1.5 5L4 7.5L8.5 2.5" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      </div>
+      <input type="checkbox" ${isClaimed?"checked":""} onchange="handleClaim(${rank},this.checked,event)">
+      <div class="cb-box"><svg class="cb-check" viewBox="0 0 10 10" fill="none"><path d="M1.5 5L4 7.5L8.5 2.5" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
     </div>
-    <div class="owner-badge ${isClaimed?'visible':''}">${owner}</div>
-  </div>
+    <div class="owner-badge ${isClaimed?"visible":""}">${owner}</div>
+  </div>`;
+}
+
+// ── LIST RENDER ────────────────────────────────────────────────────────
+function renderList() {
+  let html = "";
+  for (const tier of ["starter","medium","harder"]) {
+    const inTier = A.filter(a => a.tier===tier);
+    if (!inTier.some(a => visible(a))) continue;
+    html += `<div class="tier-label">${TIER_LABELS[tier]}</div><div class="cards">`;
+    for (const a of inTier) {
+      const exp       = expandedRank===a.rank;
+      const vis       = visible(a);
+      const isClaimed = !!claimed[a.rank];
+      const bw        = Math.round((a.build/5)*48);
+      const typePill  = a.type==="agent"
+        ? `<span class="pill p-agent">Sub-agent</span>`
+        : `<span class="pill p-skill">Skill</span>`;
+      const brCls     = BRANCHES[a.branch]?.pill || "";
+      const brLabel   = BRANCHES[a.branch]?.label || "";
+      const hasUnbuiltDeps = a.skillDeps.some(r => !claimed[r]);
+
+      html += `<div class="card${exp?" expanded":""}${isClaimed?" claimed":""}${!vis?" hidden":""}" data-rank="${a.rank}">
+  ${cbHtml(a.rank)}
   <div class="rank">${a.rank}</div>
   <div class="card-clickable" onclick="toggle(${a.rank})">
-    <div class="card-title">${a.title}</div>
+    <div class="card-title">${a.title}${hasUnbuiltDeps ? ' <span style="color:#EF9F27;font-size:10px;font-weight:400">⚠ has unbuilt dependencies</span>' : ""}</div>
+    <div class="card-desc">${a.desc}</div>
     <div class="pills">
-      <span class="pill p-pillar">${a.pillar}</span>
       ${typePill}
       <span class="pill ${BUILD_CLS[a.build]}">${BUILD_LABEL[a.build]}</span>
-      <span class="pill ${DEMO_CLS[a.demo]}">Demo: ${a.demo}</span>
-      ${a.isNew?`<span class="pill p-new">new v3</span>`:""}
-      ${a.isLive?`<span class="pill p-live">already live</span>`:""}
+      <span class="pill ${brCls}">${brLabel}</span>
+      ${a.isNew  ? `<span class="pill p-new">new v3</span>`  : ""}
+      ${a.isLive ? `<span class="pill p-live">already live</span>` : ""}
     </div>
   </div>
   <div class="scores">
-    <div class="srow"><span class="slabel">build</span><div class="strack"><div class="sfill" style="width:${buildW}px;background:${BUILD_COLOR[a.build]}"></div></div></div>
-    <div class="srow"><span class="slabel">demo</span><div class="strack"><div class="sfill" style="width:${demoW}px;background:${a.demo==="high"?"#534AB7":a.demo==="med"?"#185FA5":"#888780"}"></div></div></div>
+    <div class="srow"><span class="slabel">build</span><div class="strack"><div class="sfill" style="width:${bw}px;background:${BUILD_COLOR[a.build]}"></div></div></div>
   </div>
-  ${isClaimed?`<div class="claimed-banner">Claimed by ${owner} for AI Week</div>`:""}
+  ${isClaimed ? `<div class="claimed-banner">Claimed by ${claimed[a.rank]} for AI Week</div>` : ""}
   <div class="detail">
     <div class="dgrid">
       <div class="dblock"><div class="dlabel">Why this difficulty</div><div class="dtext">${a.why}</div></div>
-      <div class="dblock"><div class="dlabel">Demo tip</div><div class="dtext">${a.tip}</div></div>
       <div class="dblock"><div class="dlabel">Connectors</div><div class="dtext">${a.conn}</div></div>
       <div class="dblock"><div class="dlabel">Output</div><div class="dtext">${a.out}</div></div>
+      <div class="dblock"><div class="dlabel">Type reasoning</div><div class="dtext">${a.typeReason}</div></div>
     </div>
     <div class="deps-block">
-      <div class="dlabel">Key data dependencies</div>
+      <div class="dlabel">Data dependencies</div>
       <div class="deps-list">${a.deps.map(depChip).join("")}</div>
     </div>
+    ${a.skillDeps.length ? `<div class="deps-block">
+      <div class="dlabel">Must build first (skill dependencies)</div>
+      <div class="deps-list">${a.skillDeps.map(skillDepChip).join("")}</div>
+    </div>` : ""}
     <div class="type-block is-${a.type}">
-      <div>
-        <div class="type-block-label">${a.type==="agent"?"Sub-agent":"Skill"}</div>
-        <div class="type-block-text">${a.typeReason}</div>
-      </div>
+      <div class="type-block-label">${a.type==="agent"?"Sub-agent":"Skill"}</div>
+      <div class="type-block-text">${a.typeReason}</div>
     </div>
-    ${a.note?`<div class="team-note">${a.note}</div>`:""}
+    ${a.note ? `<div class="team-note">${a.note}</div>` : ""}
   </div>
 </div>`;
-}
-
-function render() {
-  let html = "";
-  for (const tier of ["starter","medium","harder"]) {
-    const inTier = A.filter(a => a.tier === tier);
-    if (!inTier.some(a => visible(a))) continue;
-    html += `<div class="tier-label">${TIER_LABELS[tier]}</div><div class="cards">`;
-    inTier.forEach(a => { html += card(a); });
+    }
     html += `</div>`;
   }
-  document.getElementById("root").innerHTML = html;
+  document.getElementById("listView").innerHTML = html;
+}
+
+// ── TREE RENDER ────────────────────────────────────────────────────────
+function renderTree() {
+  // Build reverse dep map: which agents depend on each skill
+  const dependedOnBy = {}; // rank → [ranks that depend on it]
+  for (const a of A) {
+    for (const r of (a.skillDeps || [])) {
+      if (!dependedOnBy[r]) dependedOnBy[r] = [];
+      dependedOnBy[r].push(a.rank);
+    }
+  }
+
+  let html = "";
+  for (const [brKey, brMeta] of Object.entries(BRANCHES)) {
+    const items = A.filter(a => a.branch === brKey);
+    if (!items.length) continue;
+    html += `<div class="tree-branch">
+  <div class="tree-branch-header ${brMeta.hdr}">${brMeta.label} <span class="br-count">${items.length} items</span></div>
+  <div class="tree-nodes">`;
+
+    for (const a of items) {
+      const isClaimed = !!claimed[a.rank];
+      const bw = Math.round((a.build/5)*48);
+      const typePill = a.type==="agent"
+        ? `<span class="pill p-agent" style="font-size:9px;padding:1px 5px;">Sub-agent</span>`
+        : `<span class="pill p-skill" style="font-size:9px;padding:1px 5px;">Skill</span>`;
+      const hasUnbuiltSkillDeps = a.skillDeps.some(r => !claimed[r]);
+      const isDepOf = dependedOnBy[a.rank] ? dependedOnBy[a.rank] : [];
+
+      html += `<div class="tree-node">`;
+
+      // If this item has skill deps, show them as children above
+      if (a.skillDeps.length) {
+        html += `<div class="tree-dep-label">⚠ Build these first:</div>
+<div class="tree-children">`;
+        for (const depRank of a.skillDeps) {
+          const dep = A.find(x => x.rank === depRank);
+          if (!dep) continue;
+          const depClaimed = !!claimed[dep.rank];
+          html += `<div class="tree-child-node">
+  <div class="tree-node-card${depClaimed?" claimed":""}" onclick="jumpTo(${dep.rank})" title="Jump to ${dep.title} in list view">
+    <div class="tree-node-info">
+      <div class="tree-node-title">${dep.title} ${depClaimed ? "✓" : ""}</div>
+      <div class="tree-node-desc">${dep.desc}</div>
+      <div class="tree-node-pills">
+        <span class="pill p-skill" style="font-size:9px;padding:1px 5px;">Skill</span>
+        <span class="pill ${BUILD_CLS[dep.build]}" style="font-size:9px;padding:1px 5px;">${BUILD_LABEL[dep.build]}</span>
+        ${depClaimed ? `<span class="pill p-live" style="font-size:9px;padding:1px 5px;">✓ claimed</span>` : `<span class="dep-warning">not yet claimed</span>`}
+      </div>
+    </div>
+  </div>
+</div>`;
+        }
+        html += `</div>
+<div class="tree-dep-label" style="color:#534AB7">→ Then build:</div>`;
+      }
+
+      // Main node
+      html += `<div class="tree-node-card${hasUnbuiltSkillDeps?" has-deps-unbuilt":""}${isClaimed?" claimed":""}">
+  ${cbHtml(a.rank)}
+  <div class="tree-node-info" onclick="jumpTo(${a.rank})" style="cursor:pointer">
+    <div class="tree-node-title">#${a.rank} ${a.title}</div>
+    <div class="tree-node-desc">${a.desc}</div>
+    <div class="tree-node-pills">
+      ${typePill}
+      <span class="pill ${BUILD_CLS[a.build]}" style="font-size:9px;padding:1px 5px;">${BUILD_LABEL[a.build]}</span>
+      ${a.isNew  ? `<span class="pill p-new" style="font-size:9px;padding:1px 5px;">new v3</span>`  : ""}
+      ${a.isLive ? `<span class="pill p-live" style="font-size:9px;padding:1px 5px;">already live</span>` : ""}
+      ${isClaimed ? `<span class="pill p-live" style="font-size:9px;padding:1px 5px;">✓ ${claimed[a.rank]}</span>` : ""}
+    </div>
+    ${isDepOf.length ? `<div style="font-size:9px;color:#888780;margin-top:4px;">Needed by: ${isDepOf.map(r => {const x=A.find(y=>y.rank===r);return x?x.title:"";}).join(", ")}</div>` : ""}
+  </div>
+</div>`;
+
+      html += `</div>`; // tree-node
+    }
+
+    html += `</div></div>`; // tree-nodes + tree-branch
+  }
+  document.getElementById("treeView").innerHTML = html;
 }
 
 // ── INIT ──────────────────────────────────────────────────────────────
-loadConfig();
-// Always load from cache immediately for snappy first render
-const cache = localStorage.getItem("psm_claims_cache_sb");
-if (cache) { try { claimed = JSON.parse(cache); } catch(e) {} }
-if (cfg.name) {
-  // Returning user — skip setup panel
-  document.getElementById("setupPanel").classList.add("hidden");
-  document.getElementById("claimRow").style.display = "flex";
-  document.getElementById("claimNameDisplay").textContent = cfg.name;
-}
-updateSummary(); render();
-// Always refresh from Supabase on load (works even before name is set)
-loadClaimsFromSupabase();
-
-// Auto-refresh every 60s so teammates' claims appear without reloading
-setInterval(loadClaimsFromSupabase, 60000);
+updateSummary();
+renderList();
 </script>
 </body>
 </html>
